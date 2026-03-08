@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUA — Activewear</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Josefin+Sans:wght@100;200;300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="ring"></div>
+<div class="toast" id="toast"></div>
+
+<!-- NAV -->
+
+<nav id="nav">
+  <a class="nav-logo" onclick="showPage('home')">lua</a>
+  <ul class="nav-links">
+    <li><a onclick="showPage('home');scrollTo('shop-section')">Shop</a></li>
+    <li><a onclick="showPage('home');scrollTo('collections')">Collections</a></li>
+    <li><a>About</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="nav-btn" onclick="showPage('home')">Search</button>
+    <button class="nav-btn cart-btn" onclick="showPage('cart')">
+      Bag <span class="cart-count" id="cartCount">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ===== HOME PAGE ===== -->
+
+<div class="page active" id="home-page">
+
+  <!-- HERO -->
+
+  <div class="hero">
+    <div class="hero-left">
+      <p class="hero-eyebrow">New Collection — SS 2026</p>
+      <h1 class="hero-title">Move<br>in your<br><em>element</em></h1>
+      <p class="hero-sub">Activewear designed for women who refuse to choose between performance and beauty.</p>
+      <div class="hero-actions">
+        <button class="btn btn-dark" onclick="scrollTo('shop-section')">Shop Now</button>
+        <button class="btn btn-outline" onclick="scrollTo('shop-section')">View All</button>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-visual">
+        <div class="hero-glow"></div>
+        <div class="hero-wordmark">lua</div>
+        <svg style="position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);opacity:0.22" width="220" height="420" viewBox="0 0 220 420">
+          <ellipse cx="110" cy="46" rx="30" ry="30" fill="white"/>
+          <rect x="78" y="84" width="64" height="120" rx="14" fill="rgba(107,127,163,0.9)"/>
+          <rect x="62" y="94" width="34" height="90" rx="12" fill="rgba(107,127,163,0.6)" transform="rotate(-9 62 94)"/>
+          <rect x="124" y="94" width="34" height="90" rx="12" fill="rgba(107,127,163,0.6)" transform="rotate(9 140 94)"/>
+          <rect x="84" y="198" width="24" height="150" rx="11" fill="rgba(61,79,114,0.9)"/>
+          <rect x="112" y="198" width="24" height="150" rx="11" fill="rgba(61,79,114,0.9)"/>
+        </svg>
+      </div>
+      <div class="hero-badge">
+        <p class="hero-badge-label">New Drop</p>
+        <p class="hero-badge-val">The Contour Set</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARQUEE -->
+
+  <div class="marquee">
+    <div class="marquee-inner">
+      <span class="m-item">Free Returns</span><span class="m-dot"> ✦ </span>
+      <span class="m-item">Sustainable Fabrics</span><span class="m-dot"> ✦ </span>
+      <span class="m-item">Second-Skin Fit</span><span class="m-dot"> ✦ </span>
+      <span class="m-item">New SS26 Drop</span><span class="m-dot"> ✦ </span>
+      <span class="m-item">Worldwide Shipping</span><span class="m-dot"> ✦ </span>
+      <span class="m-item">Free Returns</span><span class="m-dot"> ✦ </span>
+      <span class="m-item">Sustainable Fabrics</span><span class="m-dot"> ✦ </span>
+      <span class="m-item">Second-Skin Fit</span><span class="m-dot"> ✦ </span>
+      <span class="m-item">New SS26 Drop</span><span class="m-dot"> ✦ </span>
+      <span class="m-item">Worldwide Shipping</span><span class="m-dot"> ✦ </span>
+    </div>
+  </div>
+
+  <!-- SHOP -->
+
+  <section class="shop-section" id="shop-section">
+    <div class="shop-header reveal">
+      <div class="shop-title-group">
+        <p class="eyebrow">The Edit</p>
+        <h2>Shop All</h2>
+      </div>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="filterProducts('all',this)">All</button>
+        <button class="filter-btn" onclick="filterProducts('sets',this)">Sets</button>
+        <button class="filter-btn" onclick="filterProducts('bottoms',this)">Bottoms</button>
+        <button class="filter-btn" onclick="filterProducts('tops',this)">Tops</button>
+      </div>
+    </div>
+    <div class="products-grid reveal" id="productsGrid"></div>
+  </section>
+</div>
+
+<!-- ===== PRODUCT PAGE ===== -->
+
+<div class="page" id="product-page">
+  <div class="product-layout">
+    <div class="product-gallery" id="productGallery">
+      <div class="gallery-main" id="galleryMain"></div>
+      <div class="gallery-thumbs" id="galleryThumbs"></div>
+    </div>
+    <div class="product-info" id="productInfo"></div>
+  </div>
+</div>
+
+<!-- ===== CART PAGE ===== -->
+
+<div class="page" id="cart-page">
+  <div class="cart-layout">
+    <h1 class="cart-title">Your Bag</h1>
+    <div id="cartItems"></div>
+    <div class="cart-summary" id="cartSummary"></div>
+  </div>
+</div>
+
+<!-- ===== CHECKOUT PAGE ===== -->
+
+<div class="page" id="checkout-page">
+  <div class="checkout-layout">
+    <h1 class="checkout-title">Checkout</h1>
+    <div id="checkoutForm"></div>
+    <div id="checkoutSummary"></div>
+  </div>
+</div>
+
+<!-- ===== SUCCESS PAGE ===== -->
+
+<div class="page" id="success-page">
+  <div class="success-page">
+    <span class="success-icon">✓</span>
+    <h1>Order Confirmed!</h1>
+    <p class="order-num" id="orderNum"></p>
+    <p>Thank you for your order. You'll receive a confirmation email shortly. Your LUA pieces are being prepared with care.</p>
+    <button class="btn btn-dark" onclick="showPage('home')">Continue Shopping</button>
+  </div>
+</div>
+
+<script>
+// ===================== DATA =====================
+const products = [
+  {id:1,name:'Contour Flare Set',cat:'sets',price:89,colors:['#6b7fa3','#1a1a1a','#c8bfb0'],colorClass:['c-slate','c-black','c-stone'],badge:'New',desc:'Our signature flare set featuring high-rise scrunch leggings and a cropped long-sleeve top. Designed to sculpt and elongate.',sizes:['XS','S','M','L','XL'],outSizes:[]},
+  {id:2,name:'Sculpt Leggings',cat:'bottoms',price:55,colors:['#1a1a1a','#6b7fa3','#3d4f72'],colorClass:['c-black','c-slate','c-navy'],badge:'Bestseller',desc:'High-waisted second-skin leggings with booty-sculpting seaming. 4-way stretch compression fabric.',sizes:['XS','S','M','L','XL'],outSizes:['XS']},
+  {id:3,name:'Cloud Crop Top',cat:'tops',price:38,colors:['#8b9db8','#1a1a1a','#b08070'],colorClass:['c-steel','c-black','c-clay'],badge:'Limited',desc:'Ultra-soft cropped long-sleeve top with fitted cuffs and subtle LUA logo. Pairs perfectly with any bottom.',sizes:['XS','S','M','L','XL'],outSizes:[]},
+  {id:4,name:'Define Sports Bra',cat:'tops',price:42,colors:['#3d4f72','#1a1a1a','#8b9db8'],colorClass:['c-navy','c-black','c-steel'],badge:'',desc:'Medium-impact sports bra with adjustable straps and supportive under-band. Moisture-wicking performance fabric.',sizes:['XS','S','M','L','XL'],outSizes:['L']},
+  {id:5,name:'High-Rise Shorts',cat:'bottoms',price:45,colors:['#1a1a1a','#6b7fa3','#c8bfb0'],colorClass:['c-black','c-slate','c-stone'],badge:'New',desc:'3" high-waisted training shorts with hidden pocket. Squat-proof and quick-dry fabric.',sizes:['XS','S','M','L','XL'],outSizes:[]},
+  {id:6,name:'Seamless Set',cat:'sets',price:95,colors:['#3d4f72','#b08070','#1a1a1a'],colorClass:['c-navy','c-clay','c-black'],badge:'',desc:'Complete seamless set featuring ribbed texture for a luxury finish. No-chafe comfort for all-day wear.',sizes:['XS','S','M','L','XL'],outSizes:['M']},
+  {id:7,name:'Wrap Flare Pants',cat:'bottoms',price:62,colors:['#6b7fa3','#1a1a1a'],colorClass:['c-slate','c-black'],badge:'',desc:'Wide-leg flare pants with wrap-style waistband. Elevated enough for studio to street.',sizes:['XS','S','M','L','XL'],outSizes:[]},
+  {id:8,name:'Open-Back Top',cat:'tops',price:48,colors:['#1a1a1a','#8b9db8','#6b7fa3'],colorClass:['c-black','c-steel','c-slate'],badge:'New',desc:'Sleek long-sleeve top with open-back design and crossover straps. A statement piece for your workout.',sizes:['XS','S','M','L','XL'],outSizes:['XL']},
+];
+
+let cart = [];
+let currentProduct = null;
+let selectedSize = null;
+let selectedColor = 0;
+let selectedQty = 1;
+let activeFilter = 'all';
+
+// ===================== CURSOR =====================
+const cursorEl = document.getElementById('cursor');
+const ringEl = document.getElementById('ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cursorEl.style.left=mx+'px';cursorEl.style.top=my+'px';
+});
+(function animRing(){rx+=(mx-rx)*0.13;ry+=(my-ry)*0.13;ringEl.style.left=rx+'px';ringEl.style.top=ry+'px';requestAnimationFrame(animRing);})();
+
+// ===================== NAV =====================
+window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scrolled',scrollY>60));
+
+// ===================== PAGES =====================
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(name+'-page').classList.add('active');
+  window.scrollTo(0,0);
+  if(name==='cart') renderCart();
+  if(name==='checkout') renderCheckout();
+}
+
+function scrollTo(id){
+  setTimeout(()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth'}),50);
+}
+
+// ===================== PRODUCTS =====================
+function renderProducts(filter='all'){
+  const grid = document.getElementById('productsGrid');
+  const list = filter==='all' ? products : products.filter(p=>p.cat===filter);
+  grid.innerHTML = list.map(p=>`
+    <div class="product-card" onclick="openProduct(${p.id})">
+      <div class="product-img-wrap">
+        <div class="product-img ${p.colorClass[0]}" id="pimg-${p.id}" style="min-height:100%;"></div>
+        <div class="product-overlay">
+          <button class="quick-add" onclick="event.stopPropagation();quickAdd(${p.id})">Quick Add</button>
+        </div>
+        ${p.badge?`<span class="prod-badge ${p.badge==='New'?'new':p.badge==='Sale'?'sale':''}">${p.badge}</span>`:''}
+        <button class="wish-btn" id="wish-${p.id}" onclick="event.stopPropagation();toggleWish(${p.id})">♡</button>
+      </div>
+      <h3 class="prod-name">${p.name}</h3>
+      <div class="prod-meta">
+        <span class="prod-cat">${p.cat}</span>
+        <span class="prod-price">€${p.price}</span>
+      </div>
+      <div class="prod-colors">
+        ${p.colors.map((c,i)=>`<div class="color-dot ${i===0?'active':''}" style="background:${c}" onclick="event.stopPropagation();changeCardColor(${p.id},${i})"></div>`).join('')}
+      </div>
+    </div>
+  `).join('');
+  observeReveal();
+}
+
+function changeCardColor(pid,ci){
+  const p = products.find(x=>x.id===pid);
+  const img = document.getElementById('pimg-'+pid);
+  img.className = 'product-img '+p.colorClass[ci];
+  img.closest('.product-img-wrap').querySelectorAll('.color-dot').forEach((d,i)=>d.classList.toggle('active',i===ci));
+}
+
+function filterProducts(f,btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilter=f; renderProducts(f);
+}
+
+function quickAdd(pid){
+  const p = products.find(x=>x.id===pid);
+  addToCart(p,'M',0,1);
+}
+
+// ===================== PRODUCT PAGE =====================
+function openProduct(pid){
+  currentProduct = products.find(x=>x.id===pid);
+  selectedSize = null; selectedColor = 0; selectedQty = 1;
+  showPage('product');
+  renderProductPage();
+}
+
+function renderProductPage(){
+  const p = currentProduct;
+  // Gallery
+  document.getElementById('galleryMain').innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;" class="${p.colorClass[selectedColor]}"><svg width="180" height="360" viewBox="0 0 180 360" fill="none" style="opacity:0.3"><ellipse cx="90" cy="38" rx="24" ry="24" fill="white"/><rect x="64" y="70" width="52" height="105" rx="12" fill="rgba(255,255,255,0.8)"/><rect x="52" y="80" width="28" height="80" rx="10" fill="rgba(255,255,255,0.5)" transform="rotate(-8 52 80)"/><rect x="100" y="80" width="28" height="80" rx="10" fill="rgba(255,255,255,0.5)" transform="rotate(8 118 80)"/><rect x="70" y="170" width="18" height="130" rx="9" fill="rgba(255,255,255,0.6)"/><rect x="92" y="170" width="18" height="130" rx="9" fill="rgba(255,255,255,0.6)"/></svg></div>`;
+  document.getElementById('galleryThumbs').innerHTML = p.colorClass.map((cc,i)=>`<div class="thumb ${i===selectedColor?'active':''}" onclick="selectColor(${i})" style="background:${p.colors[i]};"></div>`).join('');
+
+  // Info
+  document.getElementById('productInfo').innerHTML = `
+    <p class="product-breadcrumb"><span onclick="showPage('home')" style="cursor:none">Home</span> / <span onclick="showPage('home');scrollTo('shop-section')" style="cursor:none">Shop</span> / ${p.name}</p>
+    <h1>${p.name}</h1>
+    <div class="price-row"><span class="current-price">€${p.price}</span></div>
+    <p style="font-size:0.7rem;letter-spacing:0.08em;line-height:2;color:var(--mid);margin-bottom:8px;">${p.desc}</p>
+    <div class="product-divider"></div>
+    <p class="option-label">Colour <span style="color:var(--ink)" id="colorLabel">${getColorName(p.colors[selectedColor])}</span></p>
+    <div class="color-select" id="colorSelect">
+      ${p.colors.map((c,i)=>`<div class="color-swatch ${i===selectedColor?'active':''}" style="background:${c}" onclick="selectColor(${i})" title="${getColorName(c)}"></div>`).join('')}
+    </div>
+    <p class="option-label">Size <span style="float:right;color:var(--slate);font-size:0.58rem;letter-spacing:0.1em;cursor:none">Size Guide</span></p>
+    <div class="size-grid" id="sizeGrid">
+      ${p.sizes.map(s=>`<button class="size-btn ${p.outSizes.includes(s)?'out':''}" onclick="${p.outSizes.includes(s)?'':''}" data-size="${s}" ${p.outSizes.includes(s)?'disabled':''}>${s}</button>`).join('')}
+    </div>
+    <div class="add-row">
+      <div class="qty-control">
+        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+        <span class="qty-val" id="qtyDisplay">1</span>
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+      </div>
+      <button class="btn btn-slate btn-full" onclick="addFromProductPage()">Add to Bag</button>
+    </div>
+    <div class="product-details-tabs" style="margin-top:36px;">
+      <div class="tab-headers">
+        <div class="tab-h active" onclick="switchTab(this,'details')">Details</div>
+        <div class="tab-h" onclick="switchTab(this,'care')">Care</div>
+        <div class="tab-h" onclick="switchTab(this,'shipping')">Shipping</div>
+      </div>
+      <div class="tab-content active" id="tab-details"><ul>
+        <li>Second-skin compression fabric</li><li>4-way stretch, squat-proof</li>
+        <li>Moisture-wicking & quick-dry</li><li>UPF 50+ sun protection</li>
+        <li>Flatlock seams — no chafing</li><li>Made from 78% recycled fibres</li>
+      </ul></div>
+      <div class="tab-content" id="tab-care"><ul>
+        <li>Machine wash cold, gentle cycle</li><li>Do not tumble dry</li>
+        <li>Do not bleach or iron</li><li>Wash inside out to preserve colour</li>
+      </ul></div>
+      <div class="tab-content" id="tab-shipping"><ul>
+        <li>Standard: 3–5 business days (€4.95)</li><li>Express: 1–2 business days (€9.95)</li>
+        <li>Free shipping on orders over €80</li><li>Free returns within 30 days</li>
+      </ul></div>
+    </div>
+  `;
+  // Attach size click events
+  document.querySelectorAll('.size-btn:not([disabled])').forEach(btn=>{
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('active'));
+      this.classList.add('active');
+      selectedSize = this.dataset.size;
+    });
+  });
+}
+
+function selectColor(ci){
+  selectedColor = ci;
+  const p = currentProduct;
+  // Update gallery
+  document.getElementById('galleryMain').querySelector('div').className = p.colorClass[ci];
+  document.querySelectorAll('#galleryThumbs .thumb').forEach((t,i)=>t.classList.toggle('active',i===ci));
+  document.querySelectorAll('#colorSelect .color-swatch').forEach((s,i)=>s.classList.toggle('active',i===ci));
+  document.getElementById('colorLabel').textContent = getColorName(p.colors[ci]);
+}
+
+function changeQty(d){
+  selectedQty = Math.max(1, selectedQty+d);
+  document.getElementById('qtyDisplay').textContent = selectedQty;
+}
+
+function switchTab(el,name){
+  document.querySelectorAll('.tab-h').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+function addFromProductPage(){
+  if(!selectedSize){showToast('Please select a size');return;}
+  addToCart(currentProduct, selectedSize, selectedColor, selectedQty);
+}
+
+function getColorName(hex){
+  const map={'#6b7fa3':'Slate Blue','#1a1a1a':'Midnight','#c8bfb0':'Sand','#8b9db8':'Steel','#3d4f72':'Deep Navy','#1a2a4a':'Ink Navy','#b08070':'Clay','#a89880':'Stone'};
+  return map[hex]||'Color';
+}
+
+// ===================== CART =====================
+function addToCart(product, size, colorIdx, qty){
+  const key = `${product.id}-${size}-${colorIdx}`;
+  const existing = cart.find(i=>i.key===key);
+  if(existing){existing.qty+=qty;}
+  else{cart.push({key,product,size,colorIdx,qty});}
+  updateCartCount();
+  showToast(`${product.name} added to bag`);
+}
+
+function updateCartCount(){
+  const total = cart.reduce((s,i)=>s+i.qty,0);
+  document.getElementById('cartCount').textContent = total;
+}
+
+function renderCart(){
+  const items = document.getElementById('cartItems');
+  const summary = document.getElementById('cartSummary');
+  if(cart.length===0){
+    items.innerHTML='<div class="empty-cart"><h2>Your bag is empty</h2><p>Discover our latest pieces</p><button class="btn btn-dark" onclick="showPage(\'home\')">Continue Shopping</button></div>';
+    summary.innerHTML='';
+    return;
+  }
+  const subtotal = cart.reduce((s,i)=>s+i.product.price*i.qty,0);
+  const shipping = subtotal>=80?0:4.95;
+  const total = subtotal+shipping;
+
+  items.innerHTML = cart.map((item,idx)=>`
+    <div class="cart-item">
+      <div class="cart-item-img">
+        <div style="width:90px;height:112px;display:flex;align-items:center;justify-content:center;" class="${item.product.colorClass[item.colorIdx]}">
+          <svg width="40" height="80" viewBox="0 0 40 80" fill="none" style="opacity:0.3"><ellipse cx="20" cy="9" rx="7" ry="7" fill="white"/><rect x="10" y="18" width="20" height="30" rx="4" fill="rgba(255,255,255,0.8)"/><rect x="11" y="46" width="8" height="30" rx="4" fill="rgba(255,255,255,0.6)"/><rect x="21" y="46" width="8" height="30" rx="4" fill="rgba(255,255,255,0.6)"/></svg>
+        </div>
+      </div>
+      <div class="cart-item-info">
+        <h3>${item.product.name}</h3>
+        <p class="cart-item-meta">${getColorName(item.product.colors[item.colorIdx])} · Size ${item.size}</p>
+        <div class="cart-item-qty">
+          <button class="cart-qty-btn" onclick="updateCartQty(${idx},-1)">−</button>
+          <span class="cart-qty-val">${item.qty}</span>
+          <button class="cart-qty-btn" onclick="updateCartQty(${idx},1)">+</button>
+        </div>
+      </div>
+      <div class="cart-item-right">
+        <span class="cart-item-price">€${(item.product.price*item.qty).toFixed(2)}</span>
+        <button class="remove-btn" onclick="removeFromCart(${idx})">Remove</button>
+      </div>
+    </div>
+  `).join('');
+
+  summary.innerHTML=`
+    <h3 class="summary-title">Order Summary</h3>
+    <div class="promo-row"><input class="promo-input" placeholder="Promo code"><button class="promo-apply">Apply</button></div>
+    <div class="summary-row"><span>Subtotal</span><span>€${subtotal.toFixed(2)}</span></div>
+    <div class="summary-row"><span>Shipping</span><span>${shipping===0?'Free':'€'+shipping.toFixed(2)}</span></div>
+    ${shipping>0?`<div style="font-size:0.58rem;letter-spacing:0.1em;color:var(--slate);margin-bottom:12px;">Add €${(80-subtotal).toFixed(2)} more for free shipping</div>`:''}
+    <div class="summary-row total"><span>Total</span><span>€${total.toFixed(2)}</span></div>
+    <button class="btn btn-dark btn-full" onclick="showPage('checkout')">Checkout</button>
+    <button class="btn btn-outline btn-full" style="margin-top:10px;" onclick="showPage('home')">Continue Shopping</button>
+  `;
+}
+
+function updateCartQty(idx,d){
+  cart[idx].qty = Math.max(1, cart[idx].qty+d);
+  updateCartCount();
+  renderCart();
+}
+
+function removeFromCart(idx){
+  cart.splice(idx,1);
+  updateCartCount();
+  renderCart();
+}
+
+// ===================== CHECKOUT =====================
+function renderCheckout(){
+  const subtotal = cart.reduce((s,i)=>s+i.product.price*i.qty,0);
+  const shipping = subtotal>=80?0:4.95;
+  const total = subtotal+shipping;
+
+  document.getElementById('checkoutForm').innerHTML=`
+    <form onsubmit="placeOrder(event)">
+      <div class="form-section">
+        <p class="form-section-title">Contact</p>
+        <div class="form-grid full"><div class="form-group"><label>Email</label><input type="email" placeholder="your@email.com" required></div></div>
+      </div>
+      <div class="form-section">
+        <p class="form-section-title">Shipping Address</p>
+        <div class="form-grid">
+          <div class="form-group"><label>First Name</label><input placeholder="Jane" required></div>
+          <div class="form-group"><label>Last Name</label><input placeholder="Doe" required></div>
+        </div>
+        <div class="form-grid full" style="margin-top:12px;"><div class="form-group"><label>Address</label><input placeholder="123 Main Street" required></div></div>
+        <div class="form-grid" style="margin-top:12px;">
+          <div class="form-group"><label>City</label><input placeholder="London" required></div>
+          <div class="form-group"><label>Postcode</label><input placeholder="SW1A 1AA" required></div>
+        </div>
+        <div class="form-grid full" style="margin-top:12px;"><div class="form-group"><label>Country</label><select required><option>United Kingdom</option><option>Ireland</option><option>Germany</option><option>France</option><option>Netherlands</option><option>Spain</option><option>Italy</option><option>Romania</option></select></div></div>
+      </div>
+      <div class="form-section">
+        <p class="form-section-title">Shipping Method</p>
+        <div class="shipping-options">
+          <label class="shipping-opt selected" onclick="this.closest('.shipping-options').querySelectorAll('.shipping-opt').forEach(e=>e.classList.remove('selected'));this.classList.add('selected')">
+            <input type="radio" name="ship" value="standard" checked>
+            <div class="shipping-opt-info"><p class="shipping-opt-name">Standard Shipping</p><p class="shipping-opt-time">3–5 business days</p></div>
+            <span class="shipping-opt-price">${subtotal>=80?'Free':'€4.95'}</span>
+          </label>
+          <label class="shipping-opt" onclick="this.closest('.shipping-options').querySelectorAll('.shipping-opt').forEach(e=>e.classList.remove('selected'));this.classList.add('selected')">
+            <input type="radio" name="ship" value="express">
+            <div class="shipping-opt-info"><p class="shipping-opt-name">Express Shipping</p><p class="shipping-opt-time">1–2 business days</p></div>
+            <span class="shipping-opt-price">€9.95</span>
+          </label>
+        </div>
+      </div>
+      <div class="form-section">
+        <p class="form-section-title">Payment</p>
+        <div class="form-grid full"><div class="form-group"><label>Card Number</label><input placeholder="1234 5678 9012 3456" maxlength="19" required></div></div>
+        <div class="form-grid" style="margin-top:12px;">
+          <div class="form-group"><label>Expiry</label><input placeholder="MM/YY" maxlength="5" required></div>
+          <div class="form-group"><label>CVV</label><input placeholder="123" maxlength="3" required></div>
+        </div>
+        <div class="form-grid full" style="margin-top:12px;"><div class="form-group"><label>Name on Card</label><input placeholder="Jane Doe" required></div></div>
+      </div>
+      <button type="submit" class="btn btn-dark btn-full" style="margin-top:8px;">Place Order — €${total.toFixed(2)}</button>
+    </form>
+  `;
+
+  document.getElementById('checkoutSummary').innerHTML=`
+    <div class="checkout-summary">
+      <h3 class="summary-title">Your Order</h3>
+      <div class="checkout-items">
+        ${cart.map(item=>`
+          <div class="checkout-item">
+            <div class="checkout-item-img ${item.product.colorClass[item.colorIdx]}">
+              <svg width="28" height="55" viewBox="0 0 28 55" fill="none" style="opacity:0.3"><ellipse cx="14" cy="6" rx="5" ry="5" fill="white"/><rect x="7" y="13" width="14" height="22" rx="3" fill="rgba(255,255,255,0.8)"/><rect x="8" y="34" width="5" height="20" rx="3" fill="rgba(255,255,255,0.6)"/><rect x="15" y="34" width="5" height="20" rx="3" fill="rgba(255,255,255,0.6)"/></svg>
+            </div>
+            <div class="checkout-item-info">
+              <h4>${item.product.name}</h4>
+              <p>Size ${item.size} · Qty ${item.qty}</p>
+            </div>
+            <span class="checkout-item-price">€${(item.product.price*item.qty).toFixed(2)}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="product-divider"></div>
+      <div class="summary-row"><span>Subtotal</span><span>€${subtotal.toFixed(2)}</span></div>
+      <div class="summary-row"><span>Shipping</span><span>${shipping===0?'Free':'€'+shipping.toFixed(2)}</span></div>
+      <div class="summary-row total"><span>Total</span><span>€${total.toFixed(2)}</span></div>
+    </div>
+  `;
+}
+
+function placeOrder(e){
+  e.preventDefault();
+  const orderNum = 'LUA-'+Math.random().toString(36).substr(2,8).toUpperCase();
+  document.getElementById('orderNum').textContent = 'Order '+orderNum;
+  cart=[];
+  updateCartCount();
+  showPage('success');
+}
+
+// ===================== TOAST =====================
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ===================== WISHLIST by Crinu for Alice :3 =====================
+function toggleWish(pid){
+  const btn=document.getElementById('wish-'+pid);
+  if(!btn)return;
+  btn.classList.toggle('active');
+  btn.textContent=btn.classList.contains('active')?'♥':'♡';
+}
+
+// ===================== REVEAL =====================
+function observeReveal(){
+  const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:0.08});
+  document.querySelectorAll('.reveal').forEach(r=>io.observe(r));
+}
+
+// ===================== INIT =====================
+renderProducts();
+observeReveal();
+</script>
+
+</body>
+</html>
