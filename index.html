@@ -20,9 +20,9 @@
 <nav id="nav">
   <a class="nav-logo" onclick="showPage('home')">lua</a>
   <ul class="nav-links">
-    <li><a onclick="showPage('home');scrollTo('shop-section')">Shop</a></li>
-    <li><a onclick="showPage('home');scrollTo('collections')">Collections</a></li>
-    <li><a onclick="showPage('home');scrollTo('about')">About</a></li>
+    <li><a onclick="showPage('home');scrollToSection('shop-section')">Shop</a></li>
+    <li><a onclick="showPage('home');scrollToSection('collections')">Collections</a></li>
+    <li><a onclick="showPage('home');scrollToSection('about')">About</a></li>
   </ul>
   <div class="nav-right">
     <button class="nav-btn" onclick="showPage('home')">Search</button>
@@ -44,8 +44,8 @@
       <h1 class="hero-title">Move<br>in your<br><em>element</em></h1>
       <p class="hero-sub">Activewear designed for women who refuse to choose between performance and beauty.</p>
       <div class="hero-actions">
-        <button class="btn btn-dark" onclick="scrollTo('shop-section')">Shop Now</button>
-        <button class="btn btn-outline" onclick="scrollTo('shop-section')">View All</button>
+        <button class="btn btn-dark" onclick="scrollToSection('shop-section')">Shop Now</button>
+        <button class="btn btn-outline" onclick="scrollToSection('shop-section')">View All</button>
       </div>
     </div>
     <div class="hero-right">
@@ -113,21 +113,21 @@
       </div>
     </div>
     <div class="collections-grid reveal">
-      <div class="collection-card" onclick="filterProducts('sets', document.querySelector('.filter-btn[onclick*=sets]'));scrollTo('shop-section')">
+      <div class="collection-card" onclick="filterProducts('sets', document.querySelector('.filter-btn[onclick*=sets]'));scrollToSection('shop-section')">
         <div class="collection-img c-slate">
           <svg width="160" height="320" viewBox="0 0 160 320" fill="none" style="opacity:0.25"><ellipse cx="80" cy="34" rx="22" ry="22" fill="white"/><rect x="58" y="63" width="44" height="90" rx="11" fill="rgba(255,255,255,0.8)"/><rect x="48" y="73" width="24" height="70" rx="9" fill="rgba(255,255,255,0.5)" transform="rotate(-7 48 73)"/><rect x="88" y="73" width="24" height="70" rx="9" fill="rgba(255,255,255,0.5)" transform="rotate(7 102 73)"/><rect x="63" y="150" width="16" height="115" rx="8" fill="rgba(255,255,255,0.6)"/><rect x="81" y="150" width="16" height="115" rx="8" fill="rgba(255,255,255,0.6)"/></svg>
         </div>
         <h3 class="collection-name">Complete Sets</h3>
         <p class="collection-desc">Coordinated pieces for effortless style</p>
       </div>
-      <div class="collection-card" onclick="filterProducts('bottoms', document.querySelector('.filter-btn[onclick*=bottoms]'));scrollTo('shop-section')">
+      <div class="collection-card" onclick="filterProducts('bottoms', document.querySelector('.filter-btn[onclick*=bottoms]'));scrollToSection('shop-section')">
         <div class="collection-img c-navy">
           <svg width="160" height="200" viewBox="0 0 160 200" fill="none" style="opacity:0.25"><rect x="58" y="20" width="44" height="50" rx="11" fill="rgba(255,255,255,0.8)"/><rect x="63" y="68" width="16" height="115" rx="8" fill="rgba(255,255,255,0.7)"/><rect x="81" y="68" width="16" height="115" rx="8" fill="rgba(255,255,255,0.7)"/></svg>
         </div>
         <h3 class="collection-name">Bottoms</h3>
         <p class="collection-desc">Sculpting leggings, shorts & pants</p>
       </div>
-      <div class="collection-card" onclick="filterProducts('tops', document.querySelector('.filter-btn[onclick*=tops]'));scrollTo('shop-section')">
+      <div class="collection-card" onclick="filterProducts('tops', document.querySelector('.filter-btn[onclick*=tops]'));scrollToSection('shop-section')">
         <div class="collection-img c-steel">
           <svg width="160" height="200" viewBox="0 0 160 200" fill="none" style="opacity:0.25"><ellipse cx="80" cy="34" rx="22" ry="22" fill="white"/><rect x="58" y="63" width="44" height="90" rx="11" fill="rgba(255,255,255,0.8)"/><rect x="48" y="73" width="24" height="70" rx="9" fill="rgba(255,255,255,0.5)" transform="rotate(-7 48 73)"/><rect x="88" y="73" width="24" height="70" rx="9" fill="rgba(255,255,255,0.5)" transform="rotate(7 102 73)"/></svg>
         </div>
@@ -257,7 +257,7 @@ function showPage(name){
   if(name==='checkout') renderCheckout();
 }
 
-function scrollTo(id){
+function scrollToSection(id){
   setTimeout(()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth'}),50);
 }
 
@@ -297,7 +297,7 @@ function changeCardColor(pid,ci){
 
 function filterProducts(f,btn){
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+  if(btn) btn.classList.add('active');
   activeFilter=f; renderProducts(f);
 }
 
@@ -322,7 +322,7 @@ function renderProductPage(){
 
   // Info
   document.getElementById('productInfo').innerHTML = `
-    <p class="product-breadcrumb"><span onclick="showPage('home')" style="cursor:none">Home</span> / <span onclick="showPage('home');scrollTo('shop-section')" style="cursor:none">Shop</span> / ${p.name}</p>
+    <p class="product-breadcrumb"><span onclick="showPage('home')" style="cursor:none">Home</span> / <span onclick="showPage('home');scrollToSection('shop-section')" style="cursor:none">Shop</span> / ${p.name}</p>
     <h1>${p.name}</h1>
     <div class="price-row"><span class="current-price">€${p.price}</span></div>
     <p style="font-size:0.7rem;letter-spacing:0.08em;line-height:2;color:var(--mid);margin-bottom:8px;">${p.desc}</p>
