@@ -25,12 +25,23 @@
     <li><a onclick="showPage('home');scrollToSection('about')">About</a></li>
   </ul>
   <div class="nav-right">
-    <button class="nav-btn" onclick="showPage('home')">Search</button>
+    <button class="nav-btn" onclick="toggleSearchBar()">Search</button>
     <button class="nav-btn cart-btn" onclick="showPage('cart')">
       Bag <span class="cart-count" id="cartCount">0</span>
     </button>
   </div>
 </nav>
+
+<div class="search-panel" id="searchPanel" aria-hidden="true">
+  <input
+    id="searchInput"
+    type="text"
+    class="search-input"
+    placeholder="Search by product name..."
+    oninput="handleSearch(this.value)"
+  >
+  <button class="search-clear" onclick="clearSearch()">Clear</button>
+</div>
 
 <!-- ===== HOME PAGE ===== -->
 
@@ -234,6 +245,7 @@ let selectedSize = null;
 let selectedColor = 0;
 let selectedQty = 1;
 let activeFilter = 'all';
+let searchQuery = '';
 
 // ===================== CURSOR =====================
 const cursorEl = document.getElementById('cursor');
@@ -264,7 +276,21 @@ function scrollToSection(id){
 // ===================== PRODUCTS =====================
 function renderProducts(filter='all'){
   const grid = document.getElementById('productsGrid');
-  const list = filter==='all' ? products : products.filter(p=>p.cat===filter);
+  const q = searchQuery.trim().toLowerCase();
+  const list = products.filter(p=>{
+    const matchesFilter = filter==='all' || p.cat===filter;
+    const matchesSearch = !q || p.name.toLowerCase().includes(q);
+    return matchesFilter && matchesSearch;
+  });
+  if(list.length===0){
+    grid.innerHTML = `
+      <div class="search-empty">
+        <h3>No matching items</h3>
+        <p>Try another name, like "Sculpt" or "Contour".</p>
+      </div>
+    `;
+    return;
+  }
   grid.innerHTML = list.map(p=>`
     <div class="product-card" onclick="openProduct(${p.id})">
       <div class="product-img-wrap">
@@ -299,6 +325,38 @@ function filterProducts(f,btn){
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
   activeFilter=f; renderProducts(f);
+}
+
+function toggleSearchBar(forceOpen=false){
+  const panel = document.getElementById('searchPanel');
+  const input = document.getElementById('searchInput');
+  const willOpen = forceOpen || !panel.classList.contains('open');
+
+  panel.classList.toggle('open', willOpen);
+  panel.setAttribute('aria-hidden', willOpen ? 'false' : 'true');
+
+  if(willOpen){
+    showPage('home');
+    scrollToSection('shop-section');
+    setTimeout(()=>input.focus(), 120);
+    return;
+  }
+
+  input.blur();
+}
+
+function handleSearch(value){
+  searchQuery = value;
+  showPage('home');
+  renderProducts(activeFilter);
+}
+
+function clearSearch(){
+  searchQuery = '';
+  const input = document.getElementById('searchInput');
+  input.value = '';
+  renderProducts(activeFilter);
+  input.focus();
 }
 
 function quickAdd(pid){
