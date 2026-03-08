@@ -264,6 +264,98 @@ nav.scrolled{background:rgba(245,242,238,0.95);backdrop-filter:blur(16px);border
   .nav-links{gap:18px;}
   .nav-right{gap:14px;}
   .search-panel{top:74px;}
+
+  .hero{height:auto;min-height:100vh;grid-template-columns:1fr;}
+  .hero-left{order:2;padding:44px 24px 56px;}
+  .hero-right{order:1;min-height:52vh;}
+  .hero-wordmark{font-size:7rem;}
+  .hero-badge{left:20px;bottom:20px;}
+
+  .shop-section,.collections-section,.about-section{padding:56px 20px 72px;}
+  .shop-header{flex-direction:column;align-items:flex-start;gap:18px;}
+  .filter-row{flex-wrap:wrap;}
+
+  #product-page .product-layout{grid-template-columns:1fr;min-height:auto;}
+  .product-gallery{position:relative;top:0;height:auto;}
+  .gallery-main{height:58vh;min-height:360px;}
+  .gallery-thumbs{height:auto;padding:12px 20px 18px;}
+  .product-info{padding:24px 20px 48px;}
+
+  .cart-layout,.checkout-layout{grid-template-columns:1fr;gap:28px;padding:30px 20px 80px;}
+  .cart-title,.checkout-title{font-size:2.1rem;margin-bottom:16px;}
+  .cart-summary,.checkout-summary{position:relative;top:0;}
+
+  .success-page{padding:84px 20px;}
+  .toast{right:16px;left:16px;bottom:18px;text-align:center;}
+}
+
+@media(max-width:680px){
+  body{cursor:auto;}
+  .cursor,.cursor-ring{display:none;}
+
+  .page{padding-top:118px;}
+  nav{padding:12px 14px;align-items:flex-start;flex-wrap:wrap;row-gap:10px;}
+  nav.scrolled{padding:10px 14px;}
+  .nav-logo{font-size:1.35rem;letter-spacing:0.24em;}
+  .nav-links{order:3;flex-basis:100%;justify-content:space-between;gap:8px;padding-top:4px;border-top:1px solid var(--stone);}
+  .nav-links a{font-size:0.55rem;letter-spacing:0.16em;}
+  .nav-right{margin-left:auto;gap:10px;}
+  .nav-btn{font-size:0.52rem;letter-spacing:0.15em;padding:8px 0;}
+  .search-panel{top:104px;width:calc(100vw - 20px);padding:10px;gap:8px;}
+  .search-input{padding:10px 12px;font-size:0.62rem;}
+  .search-clear{padding:0 12px;font-size:0.5rem;}
+
+  .hero-left{padding:34px 16px 40px;}
+  .hero-right{min-height:46vh;}
+  .hero-title{font-size:clamp(3rem,17vw,4.3rem);line-height:0.94;}
+  .hero-sub{max-width:100%;font-size:0.64rem;line-height:1.75;}
+  .hero-actions{gap:10px;width:100%;}
+  .hero-actions .btn{flex:1;min-height:46px;padding:12px 10px;font-size:0.52rem;letter-spacing:0.14em;}
+  .hero-wordmark{font-size:5.2rem;}
+  .hero-badge{left:12px;right:12px;bottom:12px;padding:12px 14px;}
+
+  .marquee{padding:10px 0;}
+  .m-item{padding:0 18px;font-size:0.52rem;}
+
+  .shop-section,.collections-section,.about-section{padding:44px 16px 58px;}
+  .shop-title-group h2,.about-left h2{font-size:2.2rem;}
+  .products-grid{grid-template-columns:1fr;gap:22px;}
+  .filter-btn{padding:10px 14px;font-size:0.55rem;}
+
+  .collection-name{font-size:1.35rem;}
+  .collection-desc{font-size:0.62rem;}
+
+  .about-content{gap:38px;}
+  .about-text{font-size:0.66rem;line-height:1.8;}
+  .about-values{gap:16px;margin-top:28px;}
+
+  .gallery-main{height:50vh;min-height:280px;}
+  .thumb{width:48px;height:60px;}
+  .product-breadcrumb{font-size:0.5rem;line-height:1.6;}
+  .product-info h1{font-size:2rem;}
+  .option-label{font-size:0.56rem;}
+  .size-grid{grid-template-columns:repeat(4,1fr);}
+  .add-row{flex-direction:column;}
+  .qty-control{width:100%;justify-content:space-between;}
+  .qty-btn,.qty-val{width:33%;}
+  .tab-headers{overflow-x:auto;white-space:nowrap;}
+  .tab-h{margin-right:18px;font-size:0.52rem;}
+
+  .cart-item{grid-template-columns:72px 1fr;grid-template-areas:'img info' 'img right';gap:12px;}
+  .cart-item-img{grid-area:img;}
+  .cart-item-info{grid-area:info;}
+  .cart-item-right{grid-area:right;align-items:flex-start;text-align:left;}
+  .cart-item-meta{font-size:0.54rem;}
+  .summary-title{font-size:1.2rem;}
+
+  .form-grid{grid-template-columns:1fr;}
+  .shipping-opt{padding:12px 10px;gap:10px;}
+  .shipping-opt-name{font-size:0.62rem;}
+  .shipping-opt-time{font-size:0.52rem;}
+  .shipping-opt-price{font-size:0.64rem;}
+
+  .success-page h1{font-size:2.2rem;}
+  .success-page p{font-size:0.64rem;letter-spacing:0.08em;}
 }
 
 /* MISC */
