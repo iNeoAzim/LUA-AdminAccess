@@ -25,7 +25,7 @@
     <li><a onclick="showPage('home');scrollToSection('about')">About</a></li>
   </ul>
   <div class="nav-right">
-    <button class="nav-btn" onclick="toggleSearchBar()">Search</button>
+    <button class="nav-btn" id="searchToggleBtn" onclick="toggleSearchBar()">Search</button>
     <button class="nav-btn cart-btn" onclick="showPage('cart')">
       Bag <span class="cart-count" id="cartCount">0</span>
     </button>
@@ -246,6 +246,12 @@ let selectedColor = 0;
 let selectedQty = 1;
 let activeFilter = 'all';
 let searchQuery = '';
+let searchToggleLocked = false;
+
+function lockSearchToggle(){
+  searchToggleLocked = true;
+  setTimeout(()=>{ searchToggleLocked = false; }, 180);
+}
 
 // ===================== CURSOR =====================
 const cursorEl = document.getElementById('cursor');
@@ -328,26 +334,48 @@ function filterProducts(f,btn){
 }
 
 function toggleSearchBar(forceOpen=false){
+  if(searchToggleLocked) return;
+
   const panel = document.getElementById('searchPanel');
   const input = document.getElementById('searchInput');
   const willOpen = forceOpen || !panel.classList.contains('open');
+  lockSearchToggle();
 
   panel.classList.toggle('open', willOpen);
   panel.setAttribute('aria-hidden', willOpen ? 'false' : 'true');
 
   if(willOpen){
-    showPage('home');
+    if(!document.getElementById('home-page').classList.contains('active')){
+      showPage('home');
+    }
+    renderProducts(activeFilter);
     scrollToSection('shop-section');
     setTimeout(()=>input.focus(), 120);
     return;
   }
 
+  closeSearchBar(true);
+}
+
+function closeSearchBar(skipLock=false){
+  if(!skipLock){
+    if(searchToggleLocked) return;
+    lockSearchToggle();
+  }
+
+  const panel = document.getElementById('searchPanel');
+  const input = document.getElementById('searchInput');
+  panel.classList.remove('open');
+  panel.setAttribute('aria-hidden', 'true');
   input.blur();
 }
 
 function handleSearch(value){
   searchQuery = value;
-  showPage('home');
+  if(!document.getElementById('home-page').classList.contains('active')){
+    showPage('home');
+    scrollToSection('shop-section');
+  }
   renderProducts(activeFilter);
 }
 
@@ -358,6 +386,24 @@ function clearSearch(){
   renderProducts(activeFilter);
   input.focus();
 }
+
+document.addEventListener('keydown', (event)=>{
+  if(event.key === 'Escape'){
+    closeSearchBar();
+  }
+});
+
+function isInSearchUi(event){
+  const path = typeof event.composedPath === 'function' ? event.composedPath() : [];
+  return path.some(node => node?.id === 'searchPanel' || node?.id === 'searchToggleBtn');
+}
+
+document.addEventListener('pointerdown', (event)=>{
+  const panel = document.getElementById('searchPanel');
+  if(!panel.classList.contains('open')) return;
+  if(isInSearchUi(event)) return;
+  closeSearchBar();
+});
 
 function quickAdd(pid){
   const p = products.find(x=>x.id===pid);
