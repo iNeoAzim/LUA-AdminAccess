@@ -1,1 +1,1078 @@
+<!DOCTYPE html>
 
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUA — Activewear</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Josefin+Sans:wght@100;200;300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1a1a;
+  --white: #fafaf8;
+  --slate: #6b7fa3;
+  --navy: #3d4f72;
+  --steel: #8b9db8;
+  --stone: #c8bfb0;
+  --clay: #b08070;
+  --mid: #888;
+  --border: #e8e4de;
+  --bg: #f5f3ef;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Josefin Sans',sans-serif;background:var(--white);color:var(--ink);cursor:none;overflow-x:hidden;}
+a,button{cursor:none;}
+
+/* CURSOR */
+.cursor{position:fixed;width:8px;height:8px;background:var(–ink);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform 0.1s;}
+.cursor-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(26,26,26,0.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
+
+/* TOAST */
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);background:var(–ink);color:var(–white);padding:12px 28px;font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;border-radius:2px;opacity:0;transition:all 0.3s;z-index:8000;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:20px 48px;transition:all 0.4s;background:transparent;}
+nav.scrolled{background:rgba(245,243,239,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(–border);}
+.nav-logo{font-family:‘Cormorant Garamond’,serif;font-size:1.8rem;font-weight:300;letter-spacing:0.2em;text-decoration:none;color:var(–ink);cursor:none;}
+.nav-links{display:flex;gap:36px;list-style:none;}
+.nav-links a{font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;color:var(–ink);text-decoration:none;cursor:none;}
+.nav-right{display:flex;gap:16px;align-items:center;}
+.nav-btn{background:none;border:none;font-family:‘Josefin Sans’,sans-serif;font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;color:var(–ink);padding:6px 0;cursor:none;}
+.cart-btn{position:relative;}
+.cart-count{background:var(–ink);color:var(–white);border-radius:50%;width:16px;height:16px;font-size:0.5rem;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;}
+
+/* SEARCH */
+.search-panel{position:fixed;top:64px;left:0;right:0;z-index:900;background:rgba(245,243,239,0.98);backdrop-filter:blur(16px);border-bottom:1px solid var(–border);padding:0 48px;max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding 0.35s ease;}
+.search-panel.open{max-height:80px;padding:16px 48px;}
+.search-input{width:100%;background:none;border:none;outline:none;font-family:‘Josefin Sans’,sans-serif;font-size:0.75rem;letter-spacing:0.12em;color:var(–ink);padding:8px 0;border-bottom:1px solid var(–ink);}
+.search-clear{position:absolute;right:48px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:0.58rem;letter-spacing:0.1em;cursor:none;color:var(–mid);}
+
+/* PAGES */
+.page{display:none;}
+.page.active{display:block;}
+
+/* HERO */
+.hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:0 48px;padding-top:80px;gap:48px;background:var(–bg);}
+.hero-eyebrow{font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:var(–slate);margin-bottom:20px;}
+.hero-title{font-family:‘Cormorant Garamond’,serif;font-size:clamp(3rem,6vw,5.5rem);font-weight:300;line-height:1.05;margin-bottom:24px;}
+.hero-title em{font-style:italic;color:var(–slate);}
+.hero-sub{font-size:0.68rem;letter-spacing:0.1em;line-height:2;color:var(–mid);max-width:360px;margin-bottom:36px;}
+.hero-actions{display:flex;gap:12px;}
+.btn{font-family:‘Josefin Sans’,sans-serif;font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;padding:14px 28px;border:none;cursor:none;transition:all 0.3s;}
+.btn-dark{background:var(–ink);color:var(–white);}
+.btn-dark:hover{background:#333;}
+.btn-outline{background:transparent;border:1px solid var(–ink);color:var(–ink);}
+.btn-outline:hover{background:var(–ink);color:var(–white);}
+.btn-slate{background:var(–navy);color:var(–white);}
+.btn-slate:hover{background:var(–slate);}
+.btn-full{width:100%;}
+.hero-right{display:flex;flex-direction:column;align-items:center;gap:24px;}
+.hero-visual{width:340px;height:480px;background:linear-gradient(135deg,var(–slate),var(–navy));border-radius:4px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.hero-glow{position:absolute;width:200px;height:200px;background:rgba(255,255,255,0.08);border-radius:50%;filter:blur(40px);}
+.hero-wordmark{font-family:‘Cormorant Garamond’,serif;font-size:5rem;font-weight:300;color:rgba(255,255,255,0.15);letter-spacing:0.4em;position:absolute;}
+.hero-badge{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.hero-badge-label{font-size:0.52rem;letter-spacing:0.2em;text-transform:uppercase;color:var(–slate);}
+.hero-badge-val{font-family:‘Cormorant Garamond’,serif;font-size:1rem;font-weight:300;}
+
+/* MARQUEE */
+.marquee{overflow:hidden;border-top:1px solid var(–border);border-bottom:1px solid var(–border);padding:14px 0;background:var(–white);}
+.marquee-inner{display:flex;animation:marquee 28s linear infinite;white-space:nowrap;}
+.m-item{font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;padding:0 32px;}
+.m-dot{color:var(–slate);}
+@keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* SECTIONS */
+.shop-section,.collections-section,.about-section{padding:80px 48px;}
+.shop-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px;}
+.shop-title-group .eyebrow{font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:var(–slate);margin-bottom:8px;}
+.shop-title-group h2{font-family:‘Cormorant Garamond’,serif;font-size:2.4rem;font-weight:300;}
+.filter-row{display:flex;gap:8px;}
+.filter-btn{background:none;border:1px solid var(–border);font-family:‘Josefin Sans’,sans-serif;font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;padding:8px 18px;cursor:none;transition:all 0.2s;}
+.filter-btn.active,.filter-btn:hover{background:var(–ink);color:var(–white);border-color:var(–ink);}
+
+/* PRODUCTS */
+.products-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+.product-card{cursor:none;}
+.product-img-wrap{position:relative;overflow:hidden;background:var(–bg);aspect-ratio:3/4;margin-bottom:14px;}
+.product-img{width:100%;height:100%;object-fit:cover;transition:transform 0.5s;}
+.product-card:hover .product-img{transform:scale(1.04);}
+.product-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding:16px;opacity:0;transition:opacity 0.3s;}
+.product-card:hover .product-overlay{opacity:1;}
+.quick-add{background:rgba(245,243,239,0.95);border:none;font-family:‘Josefin Sans’,sans-serif;font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;padding:10px 20px;cursor:none;width:100%;}
+.prod-badge{position:absolute;top:12px;left:12px;font-size:0.5rem;letter-spacing:0.15em;text-transform:uppercase;padding:4px 10px;background:var(–ink);color:var(–white);}
+.prod-badge.new{background:var(–slate);}
+.wish-btn{position:absolute;top:12px;right:12px;background:none;border:none;font-size:1rem;cursor:none;color:var(–ink);}
+.wish-btn.active{color:var(–clay);}
+.prod-name{font-family:‘Cormorant Garamond’,serif;font-size:1rem;font-weight:300;margin-bottom:6px;}
+.prod-meta{display:flex;justify-content:space-between;font-size:0.58rem;letter-spacing:0.1em;color:var(–mid);margin-bottom:10px;}
+.prod-price{color:var(–ink);}
+.prod-colors{display:flex;gap:6px;}
+.color-dot{width:14px;height:14px;border-radius:50%;border:2px solid transparent;transition:border-color 0.2s;cursor:none;}
+.color-dot.active{border-color:var(–ink);}
+
+/* COLLECTIONS */
+.collections-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.collection-card{cursor:none;overflow:hidden;}
+.collection-img{aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;transition:transform 0.4s;}
+.collection-card:hover .collection-img{transform:scale(1.03);}
+.c-slate{background:linear-gradient(135deg,var(–slate),var(–navy));}
+.c-navy{background:linear-gradient(135deg,var(–navy),#1a2a4a);}
+.c-steel{background:linear-gradient(135deg,var(–steel),var(–slate));}
+.c-black{background:linear-gradient(135deg,#2a2a2a,var(–ink));}
+.c-stone{background:linear-gradient(135deg,var(–stone),#a89880);}
+.c-clay{background:linear-gradient(135deg,var(–clay),#8b5f50);}
+.collection-name{font-family:‘Cormorant Garamond’,serif;font-size:1.1rem;font-weight:300;margin:14px 0 4px;}
+.collection-desc{font-size:0.58rem;letter-spacing:0.1em;color:var(–mid);}
+
+/* ABOUT */
+.about-section{background:var(–bg);}
+.about-content{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+.about-left .eyebrow{font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:var(–slate);margin-bottom:12px;}
+.about-left h2{font-family:‘Cormorant Garamond’,serif;font-size:2.4rem;font-weight:300;line-height:1.2;margin-bottom:24px;}
+.about-left h2 em{font-style:italic;color:var(–slate);}
+.about-text{font-size:0.68rem;letter-spacing:0.08em;line-height:2;color:var(–mid);margin-bottom:16px;}
+.about-values{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:32px;}
+.value-item h4{font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px;}
+.value-item p{font-size:0.58rem;letter-spacing:0.08em;color:var(–mid);line-height:1.8;}
+.about-visual{aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;border-radius:4px;}
+
+/* PRODUCT PAGE */
+.product-layout{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;padding-top:80px;}
+.product-gallery{background:var(–bg);position:sticky;top:80px;height:calc(100vh - 80px);display:flex;flex-direction:column;gap:8px;padding:24px;}
+.gallery-main{flex:1;overflow:hidden;border-radius:2px;}
+.gallery-thumbs{display:flex;gap:8px;}
+.thumb{width:52px;height:52px;border-radius:2px;border:2px solid transparent;cursor:none;transition:border-color 0.2s;}
+.thumb.active{border-color:var(–ink);}
+.product-info{padding:48px;}
+.product-breadcrumb{font-size:0.55rem;letter-spacing:0.12em;color:var(–mid);margin-bottom:20px;text-transform:uppercase;}
+.product-info h1{font-family:‘Cormorant Garamond’,serif;font-size:2.2rem;font-weight:300;margin-bottom:16px;}
+.price-row{margin-bottom:16px;}
+.current-price{font-size:0.9rem;letter-spacing:0.1em;}
+.product-divider{border:none;border-top:1px solid var(–border);margin:20px 0;}
+.option-label{font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:12px;}
+.color-select{display:flex;gap:8px;margin-bottom:20px;}
+.color-swatch{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:none;transition:border-color 0.2s;}
+.color-swatch.active{border-color:var(–ink);}
+.size-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:20px;}
+.size-btn{border:1px solid var(–border);background:none;font-family:‘Josefin Sans’,sans-serif;font-size:0.6rem;letter-spacing:0.1em;padding:10px;cursor:none;transition:all 0.2s;}
+.size-btn.active{background:var(–ink);color:var(–white);border-color:var(–ink);}
+.size-btn.out{opacity:0.35;text-decoration:line-through;}
+.size-btn:disabled{cursor:not-allowed;}
+.add-row{display:flex;gap:12px;align-items:center;}
+.qty-control{display:flex;align-items:center;border:1px solid var(–border);padding:0 4px;}
+.qty-btn{background:none;border:none;font-size:1rem;padding:10px 12px;cursor:none;}
+.qty-val{font-size:0.7rem;letter-spacing:0.1em;padding:0 8px;min-width:24px;text-align:center;}
+.tab-headers{display:flex;border-bottom:1px solid var(–border);margin-bottom:16px;}
+.tab-h{font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;padding:12px 20px 12px 0;cursor:none;color:var(–mid);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s;}
+.tab-h.active{color:var(–ink);border-bottom-color:var(–ink);}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.tab-content ul{list-style:none;padding:0;}
+.tab-content li{font-size:0.62rem;letter-spacing:0.08em;line-height:2.2;color:var(–mid);padding-left:12px;position:relative;}
+.tab-content li::before{content:’—’;position:absolute;left:0;color:var(–slate);}
+
+/* CART */
+.cart-layout{max-width:900px;margin:0 auto;padding:120px 48px 80px;}
+.cart-title{font-family:‘Cormorant Garamond’,serif;font-size:2.4rem;font-weight:300;margin-bottom:40px;}
+.cart-item{display:grid;grid-template-columns:auto 1fr auto;gap:20px;padding:24px 0;border-bottom:1px solid var(–border);}
+.cart-item-info h3{font-family:‘Cormorant Garamond’,serif;font-size:1rem;font-weight:300;margin-bottom:6px;}
+.cart-item-meta{font-size:0.58rem;letter-spacing:0.1em;color:var(–mid);margin-bottom:12px;}
+.cart-item-qty{display:flex;align-items:center;border:1px solid var(–border);width:fit-content;}
+.cart-qty-btn{background:none;border:none;font-size:0.9rem;padding:6px 10px;cursor:none;}
+.cart-qty-val{font-size:0.65rem;padding:0 10px;}
+.cart-item-right{display:flex;flex-direction:column;align-items:flex-end;gap:12px;}
+.cart-item-price{font-size:0.75rem;letter-spacing:0.08em;}
+.remove-btn{background:none;border:none;font-size:0.52rem;letter-spacing:0.1em;text-transform:uppercase;color:var(–mid);cursor:none;text-decoration:underline;}
+.cart-summary{margin-top:32px;padding-top:24px;}
+.summary-title{font-family:‘Cormorant Garamond’,serif;font-size:1.2rem;font-weight:300;margin-bottom:20px;}
+.promo-row{display:flex;gap:8px;margin-bottom:20px;}
+.promo-input{flex:1;border:1px solid var(–border);background:none;font-family:‘Josefin Sans’,sans-serif;font-size:0.6rem;letter-spacing:0.1em;padding:10px 14px;outline:none;}
+.promo-apply{font-family:‘Josefin Sans’,sans-serif;font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;background:var(–ink);color:var(–white);border:none;padding:10px 18px;cursor:none;}
+.summary-row{display:flex;justify-content:space-between;font-size:0.62rem;letter-spacing:0.1em;margin-bottom:10px;}
+.summary-row.total{border-top:1px solid var(–border);padding-top:14px;margin-top:10px;font-size:0.7rem;}
+.empty-cart{text-align:center;padding:80px 0;}
+.empty-cart h2{font-family:‘Cormorant Garamond’,serif;font-size:2rem;font-weight:300;margin-bottom:12px;}
+.empty-cart p{font-size:0.65rem;letter-spacing:0.1em;color:var(–mid);margin-bottom:28px;}
+
+/* CHECKOUT */
+.checkout-layout{display:grid;grid-template-columns:1fr 420px;gap:0;min-height:100vh;padding-top:80px;}
+.checkout-title{font-family:‘Cormorant Garamond’,serif;font-size:2rem;font-weight:300;margin-bottom:32px;}
+#checkoutForm{padding:48px;}
+#checkoutSummary{background:var(–bg);padding:48px;border-left:1px solid var(–border);}
+.form-section{margin-bottom:28px;}
+.form-section-title{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(–slate);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(–border);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-grid.full{grid-template-columns:1fr;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group label{font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:var(–mid);}
+.form-group input,.form-group select{border:1px solid var(–border);background:none;font-family:‘Josefin Sans’,sans-serif;font-size:0.65rem;letter-spacing:0.08em;padding:12px;outline:none;transition:border-color 0.2s;color:var(–ink);}
+.form-group input:focus,.form-group select:focus{border-color:var(–ink);}
+.form-group input.error{border-color:#c0392b;}
+.form-group .field-error{font-size:0.52rem;color:#c0392b;letter-spacing:0.08em;}
+.shipping-options{display:flex;flex-direction:column;gap:8px;}
+.shipping-opt{display:flex;align-items:center;gap:16px;border:1px solid var(–border);padding:14px 16px;cursor:none;transition:border-color 0.2s;}
+.shipping-opt input{display:none;}
+.shipping-opt.selected{border-color:var(–ink);}
+.shipping-opt-info{flex:1;}
+.shipping-opt-name{font-size:0.62rem;letter-spacing:0.08em;margin-bottom:2px;}
+.shipping-opt-time{font-size:0.55rem;letter-spacing:0.08em;color:var(–mid);}
+.shipping-opt-price{font-size:0.62rem;letter-spacing:0.08em;}
+.checkout-items{display:flex;flex-direction:column;gap:14px;margin-bottom:20px;}
+.checkout-item{display:flex;gap:12px;align-items:center;}
+.checkout-item-info{flex:1;}
+.checkout-item-info h4{font-size:0.65rem;letter-spacing:0.06em;margin-bottom:2px;}
+.checkout-item-info p{font-size:0.55rem;letter-spacing:0.08em;color:var(–mid);}
+.checkout-item-price{font-size:0.62rem;letter-spacing:0.08em;}
+.checkout-summary{position:sticky;top:100px;}
+
+/* SUCCESS */
+.success-page{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:48px;}
+.success-icon{font-size:3rem;margin-bottom:24px;display:inline-flex;align-items:center;justify-content:center;width:80px;height:80px;border:1px solid var(–ink);border-radius:50%;}
+.success-page h1{font-family:‘Cormorant Garamond’,serif;font-size:2.4rem;font-weight:300;margin-bottom:12px;}
+.order-num{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(–slate);margin-bottom:16px;}
+.success-page p{font-size:0.65rem;letter-spacing:0.08em;line-height:2;color:var(–mid);max-width:400px;margin-bottom:32px;}
+.success-details{background:var(–bg);border:1px solid var(–border);padding:24px;border-radius:2px;max-width:480px;width:100%;margin-bottom:28px;text-align:left;}
+.success-details h3{font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:var(–slate);margin-bottom:16px;}
+.success-item{display:flex;justify-content:space-between;font-size:0.62rem;letter-spacing:0.08em;padding:6px 0;border-bottom:1px solid var(–border);}
+.success-item:last-child{border-bottom:none;}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity 0.7s,transform 0.7s;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* SEARCH EMPTY */
+.search-empty{grid-column:1/-1;text-align:center;padding:60px;}
+.search-empty h3{font-family:‘Cormorant Garamond’,serif;font-size:1.6rem;font-weight:300;margin-bottom:8px;}
+.search-empty p{font-size:0.62rem;letter-spacing:0.1em;color:var(–mid);}
+
+/* LOADING OVERLAY */
+.loading-overlay{position:fixed;inset:0;background:rgba(245,243,239,0.9);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:5000;display:none;}
+.loading-overlay.active{display:flex;}
+.loading-spinner{width:36px;height:36px;border:2px solid var(–border);border-top-color:var(–ink);border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:16px;}
+.loading-text{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(–mid);}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ORDERS PAGE */
+.orders-layout{max-width:900px;margin:0 auto;padding:120px 48px 80px;}
+.orders-title{font-family:‘Cormorant Garamond’,serif;font-size:2.4rem;font-weight:300;margin-bottom:40px;}
+.order-card{border:1px solid var(–border);padding:24px;margin-bottom:16px;}
+.order-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+.order-id{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(–slate);}
+.order-date{font-size:0.58rem;letter-spacing:0.08em;color:var(–mid);}
+.order-status{font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;padding:4px 10px;background:var(–ink);color:var(–white);}
+.order-items-list{font-size:0.62rem;letter-spacing:0.08em;color:var(–mid);margin-bottom:12px;}
+.order-total{font-size:0.65rem;letter-spacing:0.1em;font-weight:300;}
+
+@media(max-width:900px){
+.hero,.about-content,.products-grid,.checkout-layout{grid-template-columns:1fr;}
+nav{padding:16px 24px;}
+.shop-section,.about-section,.collections-section,.cart-layout,.orders-layout{padding:60px 24px;}
+.product-layout{grid-template-columns:1fr;}
+.product-gallery{position:relative;height:60vw;}
+#checkoutForm{padding:32px 24px;}
+#checkoutSummary{padding:32px 24px;}
+.collections-grid{grid-template-columns:1fr 1fr;}
+.products-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="ring"></div>
+<div class="toast" id="toast"></div>
+
+<!-- LOADING -->
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <p class="loading-text">Processing your order…</p>
+</div>
+
+<!-- NAV -->
+
+<nav id="nav">
+  <a class="nav-logo" onclick="showPage('home')">lua</a>
+  <ul class="nav-links">
+    <li><a onclick="showPage('home');scrollToSection('shop-section')">Shop</a></li>
+    <li><a onclick="showPage('home');scrollToSection('collections')">Collections</a></li>
+    <li><a onclick="showPage('home');scrollToSection('about')">About</a></li>
+    <li><a onclick="showPage('orders')">Orders</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="nav-btn" id="searchToggleBtn" onclick="toggleSearchBar()">Search</button>
+    <button class="nav-btn cart-btn" onclick="showPage('cart')">
+      Bag <span class="cart-count" id="cartCount">0</span>
+    </button>
+  </div>
+</nav>
+
+<div class="search-panel" id="searchPanel" aria-hidden="true">
+  <input id="searchInput" type="text" class="search-input" placeholder="Search by product name…" oninput="handleSearch(this.value)">
+  <button class="search-clear" onclick="clearSearch()">Clear</button>
+</div>
+
+<!-- HOME -->
+
+<div class="page active" id="home-page">
+  <div class="hero">
+    <div class="hero-left">
+      <p class="hero-eyebrow">New Collection — SS 2026</p>
+      <h1 class="hero-title">Move<br>in your<br><em>element</em></h1>
+      <p class="hero-sub">Activewear designed for women who refuse to choose between performance and beauty.</p>
+      <div class="hero-actions">
+        <button class="btn btn-dark" onclick="scrollToSection('shop-section')">Shop Now</button>
+        <button class="btn btn-outline" onclick="scrollToSection('shop-section')">View All</button>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-visual">
+        <div class="hero-glow"></div>
+        <div class="hero-wordmark">lua</div>
+        <svg style="position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);opacity:0.22" width="220" height="420" viewBox="0 0 220 420">
+          <ellipse cx="110" cy="46" rx="30" ry="30" fill="white"/>
+          <rect x="78" y="84" width="64" height="120" rx="14" fill="rgba(107,127,163,0.9)"/>
+          <rect x="62" y="94" width="34" height="90" rx="12" fill="rgba(107,127,163,0.6)" transform="rotate(-9 62 94)"/>
+          <rect x="124" y="94" width="34" height="90" rx="12" fill="rgba(107,127,163,0.6)" transform="rotate(9 140 94)"/>
+          <rect x="84" y="198" width="24" height="150" rx="11" fill="rgba(61,79,114,0.9)"/>
+          <rect x="112" y="198" width="24" height="150" rx="11" fill="rgba(61,79,114,0.9)"/>
+        </svg>
+      </div>
+      <div class="hero-badge">
+        <p class="hero-badge-label">New Drop</p>
+        <p class="hero-badge-val">The Contour Set</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="marquee">
+    <div class="marquee-inner">
+      <span class="m-item">Free Returns</span><span class="m-dot"> ✦ </span>
+      <span class="m-item">Sustainable Fabrics</span><span class="m-dot"> ✦ </span>
+      <span class="m-item">Second-Skin Fit</span><span class="m-dot"> ✦ </span>
+      <span class="m-item">New SS26 Drop</span><span class="m-dot"> ✦ </span>
+      <span class="m-item">Worldwide Shipping</span><span class="m-dot"> ✦ </span>
+      <span class="m-item">Free Returns</span><span class="m-dot"> ✦ </span>
+      <span class="m-item">Sustainable Fabrics</span><span class="m-dot"> ✦ </span>
+      <span class="m-item">Second-Skin Fit</span><span class="m-dot"> ✦ </span>
+      <span class="m-item">New SS26 Drop</span><span class="m-dot"> ✦ </span>
+      <span class="m-item">Worldwide Shipping</span><span class="m-dot"> ✦ </span>
+    </div>
+  </div>
+
+  <section class="shop-section" id="shop-section">
+    <div class="shop-header reveal">
+      <div class="shop-title-group">
+        <p class="eyebrow">The Edit</p>
+        <h2>Shop All</h2>
+      </div>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="filterProducts('all',this)">All</button>
+        <button class="filter-btn" onclick="filterProducts('sets',this)">Sets</button>
+        <button class="filter-btn" onclick="filterProducts('bottoms',this)">Bottoms</button>
+        <button class="filter-btn" onclick="filterProducts('tops',this)">Tops</button>
+      </div>
+    </div>
+    <div class="products-grid reveal" id="productsGrid"></div>
+  </section>
+
+  <section class="collections-section" id="collections">
+    <div class="shop-header reveal">
+      <div class="shop-title-group">
+        <p class="eyebrow">Curated for You</p>
+        <h2>Collections</h2>
+      </div>
+    </div>
+    <div class="collections-grid reveal">
+      <div class="collection-card" onclick="filterProducts('sets',document.querySelector('.filter-btn'));scrollToSection('shop-section')">
+        <div class="collection-img c-slate">
+          <svg width="160" height="320" viewBox="0 0 160 320" fill="none" style="opacity:0.25"><ellipse cx="80" cy="34" rx="22" ry="22" fill="white"/><rect x="58" y="63" width="44" height="90" rx="11" fill="rgba(255,255,255,0.8)"/><rect x="48" y="73" width="24" height="70" rx="9" fill="rgba(255,255,255,0.5)" transform="rotate(-7 48 73)"/><rect x="88" y="73" width="24" height="70" rx="9" fill="rgba(255,255,255,0.5)" transform="rotate(7 102 73)"/><rect x="63" y="150" width="16" height="115" rx="8" fill="rgba(255,255,255,0.6)"/><rect x="81" y="150" width="16" height="115" rx="8" fill="rgba(255,255,255,0.6)"/></svg>
+        </div>
+        <h3 class="collection-name">Complete Sets</h3>
+        <p class="collection-desc">Coordinated pieces for effortless style</p>
+      </div>
+      <div class="collection-card" onclick="filterProducts('bottoms',document.querySelector('.filter-btn'));scrollToSection('shop-section')">
+        <div class="collection-img c-navy">
+          <svg width="160" height="200" viewBox="0 0 160 200" fill="none" style="opacity:0.25"><rect x="58" y="20" width="44" height="50" rx="11" fill="rgba(255,255,255,0.8)"/><rect x="63" y="68" width="16" height="115" rx="8" fill="rgba(255,255,255,0.7)"/><rect x="81" y="68" width="16" height="115" rx="8" fill="rgba(255,255,255,0.7)"/></svg>
+        </div>
+        <h3 class="collection-name">Bottoms</h3>
+        <p class="collection-desc">Sculpting leggings, shorts & pants</p>
+      </div>
+      <div class="collection-card" onclick="filterProducts('tops',document.querySelector('.filter-btn'));scrollToSection('shop-section')">
+        <div class="collection-img c-steel">
+          <svg width="160" height="200" viewBox="0 0 160 200" fill="none" style="opacity:0.25"><ellipse cx="80" cy="34" rx="22" ry="22" fill="white"/><rect x="58" y="63" width="44" height="90" rx="11" fill="rgba(255,255,255,0.8)"/><rect x="48" y="73" width="24" height="70" rx="9" fill="rgba(255,255,255,0.5)" transform="rotate(-7 48 73)"/><rect x="88" y="73" width="24" height="70" rx="9" fill="rgba(255,255,255,0.5)" transform="rotate(7 102 73)"/></svg>
+        </div>
+        <h3 class="collection-name">Tops & Bras</h3>
+        <p class="collection-desc">Performance meets elegance</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-section" id="about">
+    <div class="about-content reveal">
+      <div class="about-left">
+        <p class="eyebrow">Our Story</p>
+        <h2>Born from movement,<br>made for <em>you</em></h2>
+        <p class="about-text">LUA was created for women who refuse to compromise. We believe activewear should sculpt, support, and celebrate your body — while looking effortlessly elegant.</p>
+        <p class="about-text">Every piece is thoughtfully designed with second-skin fabrics, architectural seaming, and sustainable materials. From the studio to the street, LUA moves with you.</p>
+        <div class="about-values">
+          <div class="value-item"><h4>Sustainable</h4><p>78% recycled materials in every piece</p></div>
+          <div class="value-item"><h4>Performance</h4><p>Squat-proof, sweat-wicking, UPF 50+</p></div>
+          <div class="value-item"><h4>Inclusive</h4><p>Designed to fit and flatter all bodies</p></div>
+        </div>
+      </div>
+      <div class="about-right">
+        <div class="about-visual c-slate">
+          <svg width="200" height="400" viewBox="0 0 200 400" fill="none" style="opacity:0.2"><ellipse cx="100" cy="42" rx="28" ry="28" fill="white"/><rect x="72" y="78" width="56" height="115" rx="14" fill="rgba(255,255,255,0.8)"/><rect x="58" y="88" width="30" height="85" rx="11" fill="rgba(255,255,255,0.5)" transform="rotate(-8 58 88)"/><rect x="112" y="88" width="30" height="85" rx="11" fill="rgba(255,255,255,0.5)" transform="rotate(8 128 88)"/><rect x="78" y="190" width="20" height="140" rx="10" fill="rgba(255,255,255,0.6)"/><rect x="102" y="190" width="20" height="140" rx="10" fill="rgba(255,255,255,0.6)"/></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- PRODUCT PAGE -->
+
+<div class="page" id="product-page">
+  <div class="product-layout">
+    <div class="product-gallery" id="productGallery">
+      <div class="gallery-main" id="galleryMain"></div>
+      <div class="gallery-thumbs" id="galleryThumbs"></div>
+    </div>
+    <div class="product-info" id="productInfo"></div>
+  </div>
+</div>
+
+<!-- CART PAGE -->
+
+<div class="page" id="cart-page">
+  <div class="cart-layout">
+    <h1 class="cart-title">Your Bag</h1>
+    <div id="cartItems"></div>
+    <div class="cart-summary" id="cartSummary"></div>
+  </div>
+</div>
+
+<!-- CHECKOUT PAGE -->
+
+<div class="page" id="checkout-page">
+  <div class="checkout-layout">
+    <div id="checkoutForm"></div>
+    <div id="checkoutSummary"></div>
+  </div>
+</div>
+
+<!-- SUCCESS PAGE -->
+
+<div class="page" id="success-page">
+  <div class="success-page">
+    <span class="success-icon">✓</span>
+    <h1>Order Confirmed!</h1>
+    <p class="order-num" id="orderNum"></p>
+    <div class="success-details" id="successDetails"></div>
+    <p>Thank you for your order. A confirmation email has been sent to <strong id="confirmEmail"></strong>. Your LUA pieces are being prepared with care and will ship within 1–2 business days.</p>
+    <br>
+    <div style="display:flex;gap:12px;">
+      <button class="btn btn-dark" onclick="showPage('orders')">View Orders</button>
+      <button class="btn btn-outline" onclick="showPage('home')">Continue Shopping</button>
+    </div>
+  </div>
+</div>
+
+<!-- ORDERS PAGE -->
+
+<div class="page" id="orders-page">
+  <div class="orders-layout">
+    <h1 class="orders-title">Your Orders</h1>
+    <div id="ordersList"></div>
+  </div>
+</div>
+
+<script>
+// ===================== DATA =====================
+const products = [
+  {id:1,name:'Contour Flare Set',cat:'sets',price:89,colors:['#6b7fa3','#1a1a1a','#c8bfb0'],colorClass:['c-slate','c-black','c-stone'],badge:'New',img:null,desc:'Our signature flare set featuring high-rise scrunch leggings and a cropped long-sleeve top. Designed to sculpt and elongate.',sizes:['XS','S','M','L','XL'],outSizes:[]},
+  {id:2,name:'Sculpt Leggings',cat:'bottoms',price:55,colors:['#1a1a1a','#6b7fa3','#3d4f72'],colorClass:['c-black','c-slate','c-navy'],badge:'Bestseller',img:null,desc:'High-waisted second-skin leggings with booty-sculpting seaming. 4-way stretch compression fabric.',sizes:['XS','S','M','L','XL'],outSizes:['XS']},
+  {id:3,name:'Cloud Crop Top',cat:'tops',price:38,colors:['#8b9db8','#1a1a1a','#b08070'],colorClass:['c-steel','c-black','c-clay'],badge:'Limited',img:null,desc:'Ultra-soft cropped long-sleeve top with fitted cuffs and subtle LUA logo.',sizes:['XS','S','M','L','XL'],outSizes:[]},
+  {id:4,name:'Define Sports Bra',cat:'tops',price:42,colors:['#3d4f72','#1a1a1a','#8b9db8'],colorClass:['c-navy','c-black','c-steel'],badge:'',img:null,desc:'Medium-impact sports bra with adjustable straps and supportive under-band.',sizes:['XS','S','M','L','XL'],outSizes:['L']},
+  {id:5,name:'High-Rise Shorts',cat:'bottoms',price:45,colors:['#1a1a1a','#6b7fa3','#c8bfb0'],colorClass:['c-black','c-slate','c-stone'],badge:'New',img:null,desc:'3" high-waisted training shorts with hidden pocket. Squat-proof and quick-dry.',sizes:['XS','S','M','L','XL'],outSizes:[]},
+  {id:6,name:'Seamless Set',cat:'sets',price:95,colors:['#3d4f72','#b08070','#1a1a1a'],colorClass:['c-navy','c-clay','c-black'],badge:'',img:null,desc:'Complete seamless set featuring ribbed texture for a luxury finish.',sizes:['XS','S','M','L','XL'],outSizes:['M']},
+  {id:7,name:'Wrap Flare Pants',cat:'bottoms',price:62,colors:['#6b7fa3','#1a1a1a'],colorClass:['c-slate','c-black'],badge:'',img:null,desc:'Wide-leg flare pants with wrap-style waistband.',sizes:['XS','S','M','L','XL'],outSizes:[]},
+  {id:8,name:'Open-Back Top',cat:'tops',price:48,colors:['#1a1a1a','#8b9db8','#6b7fa3'],colorClass:['c-black','c-steel','c-slate'],badge:'New',img:null,desc:'Sleek long-sleeve top with open-back design and crossover straps.',sizes:['XS','S','M','L','XL'],outSizes:['XL']},
+];
+
+let cart = [];
+let orders = JSON.parse(localStorage.getItem('lua_orders') || '[]');
+let currentProduct = null;
+let selectedSize = null;
+let selectedColor = 0;
+let selectedQty = 1;
+let activeFilter = 'all';
+let searchQuery = '';
+let searchToggleLocked = false;
+let selectedShipping = 'standard';
+let lastOrderData = null;
+
+// ===================== CURSOR =====================
+const cursorEl = document.getElementById('cursor');
+const ringEl = document.getElementById('ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursorEl.style.left=mx+'px';cursorEl.style.top=my+'px';});
+(function animRing(){rx+=(mx-rx)*0.13;ry+=(my-ry)*0.13;ringEl.style.left=rx+'px';ringEl.style.top=ry+'px';requestAnimationFrame(animRing);})();
+
+// ===================== NAV =====================
+window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scrolled',scrollY>60));
+
+// ===================== PAGES =====================
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(name+'-page').classList.add('active');
+  window.scrollTo(0,0);
+  if(name==='cart') renderCart();
+  if(name==='checkout') renderCheckout();
+  if(name==='orders') renderOrders();
+}
+
+function scrollToSection(id){
+  setTimeout(()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth'}),50);
+}
+
+// ===================== PRODUCT CARD SVG =====================
+function productCardSvg(colorClass){
+  const fills = {
+    'c-slate':'linear-gradient(135deg,#6b7fa3,#3d4f72)',
+    'c-navy':'linear-gradient(135deg,#3d4f72,#1a2a4a)',
+    'c-steel':'linear-gradient(135deg,#8b9db8,#6b7fa3)',
+    'c-black':'linear-gradient(135deg,#2a2a2a,#1a1a1a)',
+    'c-stone':'linear-gradient(135deg,#c8bfb0,#a89880)',
+    'c-clay':'linear-gradient(135deg,#b08070,#8b5f50)',
+  };
+  return `<div style="width:100%;height:100%;background:${fills[colorClass]||fills['c-slate']};display:flex;align-items:center;justify-content:center;"><svg width="80" height="160" viewBox="0 0 80 160" fill="none" style="opacity:0.25"><ellipse cx="40" cy="16" rx="12" ry="12" fill="white"/><rect x="28" y="32" width="24" height="50" rx="6" fill="rgba(255,255,255,0.8)"/><rect x="18" y="36" width="14" height="38" rx="5" fill="rgba(255,255,255,0.5)" transform="rotate(-7 18 36)"/><rect x="48" y="36" width="14" height="38" rx="5" fill="rgba(255,255,255,0.5)" transform="rotate(7 56 36)"/><rect x="31" y="82" width="8" height="60" rx="4" fill="rgba(255,255,255,0.6)"/><rect x="41" y="82" width="8" height="60" rx="4" fill="rgba(255,255,255,0.6)"/></svg></div>`;
+}
+
+// ===================== PRODUCTS =====================
+function renderProducts(filter='all'){
+  const grid = document.getElementById('productsGrid');
+  const q = searchQuery.trim().toLowerCase();
+  const list = products.filter(p=>{
+    const matchesFilter = filter==='all' || p.cat===filter;
+    const matchesSearch = !q || p.name.toLowerCase().includes(q);
+    return matchesFilter && matchesSearch;
+  });
+  if(list.length===0){
+    grid.innerHTML=`<div class="search-empty"><h3>No matching items</h3><p>Try another name, like "Sculpt" or "Contour".</p></div>`;
+    return;
+  }
+  grid.innerHTML = list.map(p=>`
+    <div class="product-card" onclick="openProduct(${p.id})">
+      <div class="product-img-wrap">
+        <div id="pimg-${p.id}" style="width:100%;height:100%;">${productCardSvg(p.colorClass[0])}</div>
+        <div class="product-overlay">
+          <button class="quick-add" onclick="event.stopPropagation();quickAdd(${p.id})">Quick Add</button>
+        </div>
+        ${p.badge?`<span class="prod-badge ${p.badge==='New'?'new':''}">${p.badge}</span>`:''}
+        <button class="wish-btn" id="wish-${p.id}" onclick="event.stopPropagation();toggleWish(${p.id})">♡</button>
+      </div>
+      <h3 class="prod-name">${p.name}</h3>
+      <div class="prod-meta"><span class="prod-cat">${p.cat}</span><span class="prod-price">€${p.price}</span></div>
+      <div class="prod-colors">
+        ${p.colors.map((c,i)=>`<div class="color-dot ${i===0?'active':''}" style="background:${c}" onclick="event.stopPropagation();changeCardColor(${p.id},${i})"></div>`).join('')}
+      </div>
+    </div>
+  `).join('');
+  observeReveal();
+}
+
+function changeCardColor(pid,ci){
+  const p = products.find(x=>x.id===pid);
+  document.getElementById('pimg-'+pid).innerHTML = productCardSvg(p.colorClass[ci]);
+  document.getElementById('pimg-'+pid).closest('.product-img-wrap').querySelectorAll('.color-dot').forEach((d,i)=>d.classList.toggle('active',i===ci));
+}
+
+function filterProducts(f,btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  activeFilter=f; renderProducts(f);
+}
+
+function lockSearchToggle(){searchToggleLocked=true;setTimeout(()=>{searchToggleLocked=false;},180);}
+function toggleSearchBar(forceOpen=false){
+  if(searchToggleLocked) return;
+  const panel=document.getElementById('searchPanel');
+  const input=document.getElementById('searchInput');
+  const willOpen=forceOpen||!panel.classList.contains('open');
+  lockSearchToggle();
+  panel.classList.toggle('open',willOpen);
+  panel.setAttribute('aria-hidden',willOpen?'false':'true');
+  if(willOpen){
+    if(!document.getElementById('home-page').classList.contains('active')) showPage('home');
+    renderProducts(activeFilter);scrollToSection('shop-section');
+    setTimeout(()=>input.focus(),120); return;
+  }
+  closeSearchBar(true);
+}
+function closeSearchBar(skipLock=false){
+  if(!skipLock){if(searchToggleLocked) return;lockSearchToggle();}
+  const panel=document.getElementById('searchPanel');
+  panel.classList.remove('open');panel.setAttribute('aria-hidden','true');
+  document.getElementById('searchInput').blur();
+}
+function handleSearch(value){
+  searchQuery=value;
+  if(!document.getElementById('home-page').classList.contains('active')){showPage('home');scrollToSection('shop-section');}
+  renderProducts(activeFilter);
+}
+function clearSearch(){
+  searchQuery='';document.getElementById('searchInput').value='';
+  renderProducts(activeFilter);document.getElementById('searchInput').focus();
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape') closeSearchBar();});
+document.addEventListener('pointerdown',e=>{
+  const panel=document.getElementById('searchPanel');
+  if(!panel.classList.contains('open')) return;
+  const path=typeof e.composedPath==='function'?e.composedPath():[];
+  if(path.some(n=>n?.id==='searchPanel'||n?.id==='searchToggleBtn')) return;
+  closeSearchBar();
+});
+
+function quickAdd(pid){
+  const p=products.find(x=>x.id===pid);
+  addToCart(p,'M',0,1);
+}
+
+// ===================== PRODUCT PAGE =====================
+function openProduct(pid){
+  currentProduct=products.find(x=>x.id===pid);
+  selectedSize=null;selectedColor=0;selectedQty=1;
+  showPage('product');renderProductPage();
+}
+
+function renderProductPage(){
+  const p=currentProduct;
+  document.getElementById('galleryMain').innerHTML=`<div style="width:100%;height:100%;">${productCardSvg(p.colorClass[0])}</div>`;
+  document.getElementById('galleryThumbs').innerHTML=p.colorClass.map((cc,i)=>`<div class="thumb ${i===selectedColor?'active':''}" onclick="selectColor(${i})" style="background:${p.colors[i]};"></div>`).join('');
+  document.getElementById('productInfo').innerHTML=`
+    <p class="product-breadcrumb"><span onclick="showPage('home')" style="cursor:none">Home</span> / <span onclick="showPage('home');scrollToSection('shop-section')" style="cursor:none">Shop</span> / ${p.name}</p>
+    <h1>${p.name}</h1>
+    <div class="price-row"><span class="current-price">€${p.price}</span></div>
+    <p style="font-size:0.7rem;letter-spacing:0.08em;line-height:2;color:var(--mid);margin-bottom:8px;">${p.desc}</p>
+    <div class="product-divider"></div>
+    <p class="option-label">Colour <span style="color:var(--ink)" id="colorLabel">${getColorName(p.colors[selectedColor])}</span></p>
+    <div class="color-select" id="colorSelect">
+      ${p.colors.map((c,i)=>`<div class="color-swatch ${i===selectedColor?'active':''}" style="background:${c}" onclick="selectColor(${i})" title="${getColorName(c)}"></div>`).join('')}
+    </div>
+    <p class="option-label">Size <span style="float:right;color:var(--slate);font-size:0.58rem;letter-spacing:0.1em;cursor:none">Size Guide</span></p>
+    <div class="size-grid" id="sizeGrid">
+      ${p.sizes.map(s=>`<button class="size-btn ${p.outSizes.includes(s)?'out':''}" data-size="${s}" ${p.outSizes.includes(s)?'disabled':''}>${s}</button>`).join('')}
+    </div>
+    <div class="add-row">
+      <div class="qty-control">
+        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+        <span class="qty-val" id="qtyDisplay">1</span>
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+      </div>
+      <button class="btn btn-slate btn-full" onclick="addFromProductPage()">Add to Bag</button>
+    </div>
+    <div class="product-details-tabs" style="margin-top:36px;">
+      <div class="tab-headers">
+        <div class="tab-h active" onclick="switchTab(this,'details')">Details</div>
+        <div class="tab-h" onclick="switchTab(this,'care')">Care</div>
+        <div class="tab-h" onclick="switchTab(this,'shipping')">Shipping</div>
+      </div>
+      <div class="tab-content active" id="tab-details"><ul>
+        <li>Second-skin compression fabric</li><li>4-way stretch, squat-proof</li>
+        <li>Moisture-wicking & quick-dry</li><li>UPF 50+ sun protection</li>
+        <li>Flatlock seams — no chafing</li><li>Made from 78% recycled fibres</li>
+      </ul></div>
+      <div class="tab-content" id="tab-care"><ul>
+        <li>Machine wash cold, gentle cycle</li><li>Do not tumble dry</li>
+        <li>Do not bleach or iron</li><li>Wash inside out to preserve colour</li>
+      </ul></div>
+      <div class="tab-content" id="tab-shipping"><ul>
+        <li>Standard: 3–5 business days (€4.95)</li><li>Express: 1–2 business days (€9.95)</li>
+        <li>Free shipping on orders over €80</li><li>Free returns within 30 days</li>
+      </ul></div>
+    </div>
+  `;
+  document.querySelectorAll('.size-btn:not([disabled])').forEach(btn=>{
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('active'));
+      this.classList.add('active');selectedSize=this.dataset.size;
+    });
+  });
+}
+
+function selectColor(ci){
+  selectedColor=ci;
+  const p=currentProduct;
+  document.getElementById('galleryMain').innerHTML=`<div style="width:100%;height:100%;">${productCardSvg(p.colorClass[ci])}</div>`;
+  document.querySelectorAll('#galleryThumbs .thumb').forEach((t,i)=>t.classList.toggle('active',i===ci));
+  document.querySelectorAll('#colorSelect .color-swatch').forEach((s,i)=>s.classList.toggle('active',i===ci));
+  document.getElementById('colorLabel').textContent=getColorName(p.colors[ci]);
+}
+
+function changeQty(d){selectedQty=Math.max(1,selectedQty+d);document.getElementById('qtyDisplay').textContent=selectedQty;}
+function switchTab(el,name){
+  document.querySelectorAll('.tab-h').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');document.getElementById('tab-'+name).classList.add('active');
+}
+function addFromProductPage(){
+  if(!selectedSize){showToast('Please select a size');return;}
+  addToCart(currentProduct,selectedSize,selectedColor,selectedQty);
+}
+function getColorName(hex){
+  const map={'#6b7fa3':'Slate Blue','#1a1a1a':'Midnight','#c8bfb0':'Sand','#8b9db8':'Steel','#3d4f72':'Deep Navy','#1a2a4a':'Ink Navy','#b08070':'Clay','#a89880':'Stone'};
+  return map[hex]||'Colour';
+}
+
+// ===================== CART =====================
+function addToCart(product,size,colorIdx,qty){
+  const key=`${product.id}-${size}-${colorIdx}`;
+  const existing=cart.find(i=>i.key===key);
+  if(existing){existing.qty+=qty;}
+  else{cart.push({key,product,size,colorIdx,qty});}
+  updateCartCount();
+  showToast(`${product.name} added to bag`);
+}
+
+function updateCartCount(){
+  const total=cart.reduce((s,i)=>s+i.qty,0);
+  document.getElementById('cartCount').textContent=total;
+}
+
+function renderCart(){
+  const items=document.getElementById('cartItems');
+  const summary=document.getElementById('cartSummary');
+  if(cart.length===0){
+    items.innerHTML='<div class="empty-cart"><h2>Your bag is empty</h2><p>Discover our latest pieces</p><button class="btn btn-dark" onclick="showPage(\'home\')">Continue Shopping</button></div>';
+    summary.innerHTML='';return;
+  }
+  const subtotal=cart.reduce((s,i)=>s+i.product.price*i.qty,0);
+  const shipping=subtotal>=80?0:4.95;
+  const total=subtotal+shipping;
+  items.innerHTML=cart.map((item,idx)=>`
+    <div class="cart-item">
+      <div class="cart-item-img">
+        <div style="width:90px;height:112px;overflow:hidden;">${productCardSvg(item.product.colorClass[item.colorIdx])}</div>
+      </div>
+      <div class="cart-item-info">
+        <h3>${item.product.name}</h3>
+        <p class="cart-item-meta">${getColorName(item.product.colors[item.colorIdx])} · Size ${item.size}</p>
+        <div class="cart-item-qty">
+          <button class="cart-qty-btn" onclick="updateCartQty(${idx},-1)">−</button>
+          <span class="cart-qty-val">${item.qty}</span>
+          <button class="cart-qty-btn" onclick="updateCartQty(${idx},1)">+</button>
+        </div>
+      </div>
+      <div class="cart-item-right">
+        <span class="cart-item-price">€${(item.product.price*item.qty).toFixed(2)}</span>
+        <button class="remove-btn" onclick="removeFromCart(${idx})">Remove</button>
+      </div>
+    </div>
+  `).join('');
+  summary.innerHTML=`
+    <h3 class="summary-title">Order Summary</h3>
+    <div class="promo-row"><input class="promo-input" placeholder="Promo code" id="promoInput"><button class="promo-apply" onclick="applyPromo()">Apply</button></div>
+    <div class="summary-row"><span>Subtotal</span><span>€${subtotal.toFixed(2)}</span></div>
+    <div class="summary-row"><span>Shipping</span><span>${shipping===0?'Free':'€'+shipping.toFixed(2)}</span></div>
+    ${shipping>0?`<div style="font-size:0.58rem;letter-spacing:0.1em;color:var(--slate);margin-bottom:12px;">Add €${(80-subtotal).toFixed(2)} more for free shipping</div>`:''}
+    <div class="summary-row total"><span>Total</span><span>€${total.toFixed(2)}</span></div>
+    <button class="btn btn-dark btn-full" onclick="showPage('checkout')">Checkout</button>
+    <button class="btn btn-outline btn-full" style="margin-top:10px;" onclick="showPage('home')">Continue Shopping</button>
+  `;
+}
+
+function applyPromo(){
+  const code = document.getElementById('promoInput').value.trim().toUpperCase();
+  if(code==='LUA10') showToast('10% discount applied!');
+  else showToast('Invalid promo code');
+}
+
+function updateCartQty(idx,d){
+  cart[idx].qty=Math.max(1,cart[idx].qty+d);
+  updateCartCount();renderCart();
+}
+function removeFromCart(idx){cart.splice(idx,1);updateCartCount();renderCart();}
+
+// ===================== CHECKOUT =====================
+function calcTotals(){
+  const subtotal=cart.reduce((s,i)=>s+i.product.price*i.qty,0);
+  const shippingCost = selectedShipping==='express'?9.95:(subtotal>=80?0:4.95);
+  return{subtotal,shippingCost,total:subtotal+shippingCost};
+}
+
+function renderCheckout(){
+  if(cart.length===0){showPage('cart');return;}
+  const {subtotal,shippingCost,total}=calcTotals();
+
+  document.getElementById('checkoutForm').innerHTML=`
+    <div style="padding:48px;">
+      <h1 class="checkout-title">Checkout</h1>
+
+      <div class="form-section">
+        <p class="form-section-title">Contact</p>
+        <div class="form-grid full"><div class="form-group">
+          <label>Email *</label>
+          <input type="email" id="f-email" placeholder="your@email.com" required>
+          <span class="field-error" id="err-email"></span>
+        </div></div>
+      </div>
+
+      <div class="form-section">
+        <p class="form-section-title">Shipping Address</p>
+        <div class="form-grid">
+          <div class="form-group"><label>First Name *</label><input id="f-fname" placeholder="Jane" required><span class="field-error" id="err-fname"></span></div>
+          <div class="form-group"><label>Last Name *</label><input id="f-lname" placeholder="Doe" required><span class="field-error" id="err-lname"></span></div>
+        </div>
+        <div class="form-grid full" style="margin-top:12px;"><div class="form-group"><label>Address *</label><input id="f-addr" placeholder="123 Main Street" required><span class="field-error" id="err-addr"></span></div></div>
+        <div class="form-grid" style="margin-top:12px;">
+          <div class="form-group"><label>City *</label><input id="f-city" placeholder="London" required><span class="field-error" id="err-city"></span></div>
+          <div class="form-group"><label>Postcode *</label><input id="f-post" placeholder="SW1A 1AA" required><span class="field-error" id="err-post"></span></div>
+        </div>
+        <div class="form-grid full" style="margin-top:12px;"><div class="form-group"><label>Country</label><select id="f-country"><option>United Kingdom</option><option>Ireland</option><option>Germany</option><option>France</option><option>Netherlands</option><option>Spain</option><option>Italy</option><option>Romania</option></select></div></div>
+      </div>
+
+      <div class="form-section">
+        <p class="form-section-title">Shipping Method</p>
+        <div class="shipping-options" id="shippingOptions">
+          <label class="shipping-opt selected" onclick="setShipping('standard',this)">
+            <input type="radio" name="ship" value="standard" checked>
+            <div class="shipping-opt-info"><p class="shipping-opt-name">Standard Shipping</p><p class="shipping-opt-time">3–5 business days</p></div>
+            <span class="shipping-opt-price" id="std-price">${subtotal>=80?'Free':'€4.95'}</span>
+          </label>
+          <label class="shipping-opt" onclick="setShipping('express',this)">
+            <input type="radio" name="ship" value="express">
+            <div class="shipping-opt-info"><p class="shipping-opt-name">Express Shipping</p><p class="shipping-opt-time">1–2 business days</p></div>
+            <span class="shipping-opt-price">€9.95</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <p class="form-section-title">Payment</p>
+        <div class="form-grid full"><div class="form-group">
+          <label>Card Number *</label>
+          <input id="f-card" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)" required>
+          <span class="field-error" id="err-card"></span>
+        </div></div>
+        <div class="form-grid" style="margin-top:12px;">
+          <div class="form-group"><label>Expiry *</label><input id="f-expiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)" required><span class="field-error" id="err-expiry"></span></div>
+          <div class="form-group"><label>CVV *</label><input id="f-cvv" placeholder="123" maxlength="3" type="password" required><span class="field-error" id="err-cvv"></span></div>
+        </div>
+        <div class="form-grid full" style="margin-top:12px;"><div class="form-group">
+          <label>Name on Card *</label>
+          <input id="f-cardname" placeholder="Jane Doe" required>
+          <span class="field-error" id="err-cardname"></span>
+        </div></div>
+        <div style="margin-top:12px;font-size:0.55rem;letter-spacing:0.08em;color:var(--mid);display:flex;align-items:center;gap:6px;">
+          🔒 Payments are encrypted and secure. We never store card details.
+        </div>
+      </div>
+
+      <button class="btn btn-dark btn-full" style="margin-top:8px;" id="placeOrderBtn" onclick="placeOrder()">
+        Place Order — €<span id="totalDisplay">${total.toFixed(2)}</span>
+      </button>
+      <button class="btn btn-outline btn-full" style="margin-top:10px;" onclick="showPage('cart')">← Back to Bag</button>
+    </div>
+  `;
+
+  document.getElementById('checkoutSummary').innerHTML=`
+    <div class="checkout-summary" style="padding:48px;">
+      <h3 class="summary-title">Your Order</h3>
+      <div class="checkout-items">
+        ${cart.map(item=>`
+          <div class="checkout-item">
+            <div class="checkout-item-img">
+              <div style="width:52px;height:65px;overflow:hidden;border-radius:2px;">${productCardSvg(item.product.colorClass[item.colorIdx])}</div>
+            </div>
+            <div class="checkout-item-info">
+              <h4>${item.product.name}</h4>
+              <p>Size ${item.size} · Qty ${item.qty}</p>
+            </div>
+            <span class="checkout-item-price">€${(item.product.price*item.qty).toFixed(2)}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="product-divider"></div>
+      <div class="summary-row"><span>Subtotal</span><span>€${subtotal.toFixed(2)}</span></div>
+      <div class="summary-row" id="summaryShipping"><span>Shipping</span><span>${shippingCost===0?'Free':'€'+shippingCost.toFixed(2)}</span></div>
+      <div class="summary-row total" id="summaryTotal"><span>Total</span><span>€${total.toFixed(2)}</span></div>
+    </div>
+  `;
+}
+
+function setShipping(type, el){
+  selectedShipping = type;
+  document.querySelectorAll('.shipping-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  const {shippingCost,total} = calcTotals();
+  document.getElementById('summaryShipping').innerHTML=`<span>Shipping</span><span>${shippingCost===0?'Free':'€'+shippingCost.toFixed(2)}</span>`;
+  document.getElementById('summaryTotal').innerHTML=`<span>Total</span><span>€${total.toFixed(2)}</span>`;
+  document.getElementById('totalDisplay').textContent=total.toFixed(2);
+}
+
+function formatCard(input){
+  let v=input.value.replace(/\D/g,'').substring(0,16);
+  input.value=v.replace(/(.{4})/g,'$1 ').trim();
+}
+function formatExpiry(input){
+  let v=input.value.replace(/\D/g,'');
+  if(v.length>=2) v=v.substring(0,2)+'/'+v.substring(2,4);
+  input.value=v;
+}
+
+// ===================== VALIDATION =====================
+function validateCheckout(){
+  let valid=true;
+  const fields=[
+    {id:'f-email',err:'err-email',label:'Email',validate:v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)},
+    {id:'f-fname',err:'err-fname',label:'First name',validate:v=>v.trim().length>=2},
+    {id:'f-lname',err:'err-lname',label:'Last name',validate:v=>v.trim().length>=2},
+    {id:'f-addr',err:'err-addr',label:'Address',validate:v=>v.trim().length>=5},
+    {id:'f-city',err:'err-city',label:'City',validate:v=>v.trim().length>=2},
+    {id:'f-post',err:'err-post',label:'Postcode',validate:v=>v.trim().length>=3},
+    {id:'f-card',err:'err-card',label:'Card number',validate:v=>v.replace(/\s/g,'').length===16},
+    {id:'f-expiry',err:'err-expiry',label:'Expiry',validate:v=>/^\d{2}\/\d{2}$/.test(v)},
+    {id:'f-cvv',err:'err-cvv',label:'CVV',validate:v=>/^\d{3}$/.test(v)},
+    {id:'f-cardname',err:'err-cardname',label:'Name on card',validate:v=>v.trim().length>=2},
+  ];
+  fields.forEach(f=>{
+    const el=document.getElementById(f.id);
+    const errEl=document.getElementById(f.err);
+    if(!el||!errEl) return;
+    if(!f.validate(el.value)){
+      el.classList.add('error');
+      errEl.textContent=`${f.label} is required or invalid`;
+      valid=false;
+    } else {
+      el.classList.remove('error');
+      errEl.textContent='';
+    }
+  });
+  // Expiry month/year check
+  const expInput=document.getElementById('f-expiry');
+  if(expInput){
+    const parts=expInput.value.split('/');
+    if(parts.length===2){
+      const month=parseInt(parts[0]);
+      const year=parseInt('20'+parts[1]);
+      const now=new Date();
+      if(month<1||month>12||(year<now.getFullYear()||(year===now.getFullYear()&&month<now.getMonth()+1))){
+        document.getElementById('f-expiry').classList.add('error');
+        document.getElementById('err-expiry').textContent='Card appears to be expired';
+        valid=false;
+      }
+    }
+  }
+  return valid;
+}
+
+// ===================== PLACE ORDER =====================
+function placeOrder(){
+  if(!validateCheckout()) return;
+
+  // Show loading
+  document.getElementById('loadingOverlay').classList.add('active');
+  document.getElementById('placeOrderBtn').disabled=true;
+
+  // Simulate payment processing (1.5s)
+  setTimeout(()=>{
+    document.getElementById('loadingOverlay').classList.remove('active');
+
+    const orderNum='LUA-'+Math.random().toString(36).substr(2,8).toUpperCase();
+    const email=document.getElementById('f-email').value;
+    const fname=document.getElementById('f-fname').value;
+    const lname=document.getElementById('f-lname').value;
+    const addr=document.getElementById('f-addr').value;
+    const city=document.getElementById('f-city').value;
+    const post=document.getElementById('f-post').value;
+    const country=document.getElementById('f-country').value;
+    const {subtotal,shippingCost,total}=calcTotals();
+
+    // Save order to localStorage
+    const order={
+      id:orderNum,
+      date:new Date().toISOString(),
+      email,
+      name:`${fname} ${lname}`,
+      address:`${addr}, ${city}, ${post}, ${country}`,
+      shipping:selectedShipping,
+      items:cart.map(i=>({name:i.product.name,size:i.size,color:getColorName(i.product.colors[i.colorIdx]),qty:i.qty,price:i.product.price})),
+      subtotal,shippingCost,total,
+      status:'Processing'
+    };
+    orders.unshift(order);
+    localStorage.setItem('lua_orders',JSON.stringify(orders));
+    lastOrderData=order;
+
+    // Clear cart
+    cart=[];
+    updateCartCount();
+
+    // Show success
+    document.getElementById('orderNum').textContent='Order '+orderNum;
+    document.getElementById('confirmEmail').textContent=email;
+    document.getElementById('successDetails').innerHTML=`
+      <h3>Order Details</h3>
+      ${order.items.map(i=>`<div class="success-item"><span>${i.name} (${i.size}, ${i.color}) × ${i.qty}</span><span>€${(i.price*i.qty).toFixed(2)}</span></div>`).join('')}
+      <div class="success-item"><span>Shipping (${selectedShipping})</span><span>${shippingCost===0?'Free':'€'+shippingCost.toFixed(2)}</span></div>
+      <div class="success-item" style="font-weight:500;"><span>Total Charged</span><span>€${total.toFixed(2)}</span></div>
+      <div style="margin-top:12px;font-size:0.55rem;letter-spacing:0.08em;color:var(--mid);">Delivery to: ${addr}, ${city}, ${post}, ${country}</div>
+    `;
+    showPage('success');
+  }, 1500);
+}
+
+// ===================== ORDERS =====================
+function renderOrders(){
+  const list=document.getElementById('ordersList');
+  if(orders.length===0){
+    list.innerHTML=`<div class="empty-cart"><h2>No orders yet</h2><p>Your completed purchases will appear here</p><button class="btn btn-dark" onclick="showPage('home')">Start Shopping</button></div>`;
+    return;
+  }
+  list.innerHTML=orders.map(o=>`
+    <div class="order-card">
+      <div class="order-header">
+        <div>
+          <p class="order-id">${o.id}</p>
+          <p class="order-date">${new Date(o.date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</p>
+        </div>
+        <span class="order-status">${o.status}</span>
+      </div>
+      <div class="order-items-list">${o.items.map(i=>`${i.name} (${i.size}) × ${i.qty}`).join(' · ')}</div>
+      <div class="order-total">Total: €${o.total.toFixed(2)} · ${o.shipping==='express'?'Express':'Standard'} shipping to ${o.address.split(',').pop().trim()}</div>
+    </div>
+  `).join('');
+}
+
+// ===================== TOAST =====================
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ===================== WISHLIST =====================
+function toggleWish(pid){
+  const btn=document.getElementById('wish-'+pid);
+  if(!btn) return;
+  btn.classList.toggle('active');
+  btn.textContent=btn.classList.contains('active')?'♥':'♡';
+}
+
+// ===================== REVEAL =====================
+function observeReveal(){
+  const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:0.08});
+  document.querySelectorAll('.reveal').forEach(r=>io.observe(r));
+}
+
+// ===================== INIT =====================
+renderProducts();
+observeReveal();
+</script>
+
+</body>
+</html>
